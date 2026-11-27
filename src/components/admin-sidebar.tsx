@@ -67,18 +67,6 @@ export function AdminSidebar({ role }: { role: "admin" | "agent" }) {
                         );
                     })}
             </nav>
-            <div className="absolute bottom-6 left-5 right-5 hidden rounded-2xl border border-slate-800 bg-slate-900 p-4 lg:block">
-                <p className="text-sm font-medium text-white">Need help?</p>
-                <p className="mt-1 text-xs leading-5 text-slate-400">
-                    Contact your system administrator.
-                </p>
-                <button
-                    className="mt-3 w-full rounded-lg bg-slate-800 px-3 py-2 text-xs font-semibold text-white transition hover:bg-slate-700"
-                    type="button"
-                >
-                    Get support
-                </button>
-            </div>
         </aside>
     );
 }

@@ -28,6 +28,13 @@ const blank: PackageDraft = {
     state: "",
     city: "",
     description: "",
+    region: "India",
+    locationLabel: "",
+    imageUrl:
+        "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?q=80&w=1200",
+    hotel: "",
+    rating: 4.5,
+    features: [],
     durationDays: 1,
     durationNights: 0,
     price: 0,
@@ -170,6 +177,55 @@ function PackageForm({
                         onChange={(e) => set("city", e.target.value)}
                     />
                 </Field>
+                <Field label="Display region">
+                    <input
+                        className={input}
+                        required
+                        value={draft.region}
+                        onChange={(e) => set("region", e.target.value)}
+                        placeholder="e.g. North India"
+                    />
+                </Field>
+                <Field label="Location label">
+                    <input
+                        className={input}
+                        required
+                        value={draft.locationLabel}
+                        onChange={(e) => set("locationLabel", e.target.value)}
+                        placeholder="e.g. Srinagar & Gulmarg"
+                    />
+                </Field>
+                <div className="sm:col-span-2">
+                    <Field label="Cover image URL">
+                        <input
+                            className={input}
+                            type="url"
+                            required
+                            value={draft.imageUrl}
+                            onChange={(e) => set("imageUrl", e.target.value)}
+                        />
+                    </Field>
+                </div>
+                <Field label="Hotel / accommodation">
+                    <input
+                        className={input}
+                        required
+                        value={draft.hotel}
+                        onChange={(e) => set("hotel", e.target.value)}
+                    />
+                </Field>
+                <Field label="Rating">
+                    <input
+                        className={input}
+                        type="number"
+                        min="0"
+                        max="5"
+                        step="0.1"
+                        required
+                        value={draft.rating}
+                        onChange={(e) => set("rating", Number(e.target.value))}
+                    />
+                </Field>
                 <Field label="Price per person (₹)">
                     <input
                         className={input}
@@ -204,6 +260,24 @@ function PackageForm({
                         }
                     />
                 </Field>
+                <div className="sm:col-span-2">
+                    <Field label="Features (comma separated)">
+                        <textarea
+                            className={`${input} h-20 py-2`}
+                            value={draft.features.join(", ")}
+                            onChange={(e) =>
+                                set(
+                                    "features",
+                                    e.target.value
+                                        .split(",")
+                                        .map((value) => value.trim())
+                                        .filter(Boolean),
+                                )
+                            }
+                            placeholder="Breakfast, Guided tours, Airport transfer"
+                        />
+                    </Field>
+                </div>
                 <div className="sm:col-span-2">
                     <Field label="Description">
                         <textarea

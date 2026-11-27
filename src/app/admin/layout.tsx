@@ -4,6 +4,8 @@ import { AdminSidebar } from "@/components/admin-sidebar";
 import { getStaffIdentity } from "@/lib/auth/authorization";
 import { hasSupabaseAuthConfig } from "@/lib/supabase/config";
 
+export const instant = false;
+
 export default async function AdminLayout({
     children,
 }: {
