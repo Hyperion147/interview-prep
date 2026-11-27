@@ -13,7 +13,8 @@
     "db:seed": "tsx scripts/seed-leads.ts",
     "db:seed:visas": "tsx scripts/seed-visas.ts",
     "db:seed:packages": "tsx scripts/seed-packages.ts",
-    "db:seed:follow-ups": "tsx scripts/seed-follow-ups.ts"
+    "db:seed:follow-ups": "tsx scripts/seed-follow-ups.ts",
+    "auth:bootstrap-admin": "tsx scripts/bootstrap-admin.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
