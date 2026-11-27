@@ -1,0 +1,489 @@
+"use client";
+
+import Link from "next/link";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { Eye, FileCheck2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import {
+    documentStatuses,
+    normalizeVisa,
+    visaStatuses,
+    type VisaApplication,
+    type VisaDraft,
+    type VisaStatus,
+} from "./types";
+
+const blank: VisaDraft = {
+    applicantName: "",
+    email: "",
+    phone: "",
+    passportNumber: "",
+    destinationCountry: "",
+    visaType: "",
+    status: "draft",
+    documentStatus: "pending",
+    progress: 0,
+    applicationValue: 0,
+    notes: "",
+    submittedAt: "",
+};
+const input =
+    "h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15";
+const statusColor: Record<VisaStatus, string> = {
+    draft: "bg-slate-100 text-slate-700",
+    processed: "bg-amber-50 text-amber-700",
+    published: "bg-emerald-50 text-emerald-700",
+};
+
+function Field({
+    label,
+    children,
+}: {
+    label: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <label>
+            <span className="mb-1.5 block text-sm font-medium text-slate-700">
+                {label}
+            </span>
+            {children}
+        </label>
+    );
+}
+
+function VisaForm({
+    initial,
+    onClose,
+    onSaved,
+}: {
+    initial: VisaDraft;
+    onClose: () => void;
+    onSaved: (item: VisaApplication) => void;
+}) {
+    const [draft, setDraft] = useState(initial);
+    const [saving, setSaving] = useState(false);
+    const set = <K extends keyof VisaDraft>(key: K, value: VisaDraft[K]) =>
+        setDraft((old) => ({ ...old, [key]: value }));
+    async function submit(event: FormEvent) {
+        event.preventDefault();
+        setSaving(true);
+        const response = await fetch("/api/visas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(draft),
+        });
+        if (response.ok) onSaved(normalizeVisa(await response.json()));
+        setSaving(false);
+    }
+    return (
+        <form onSubmit={submit}>
+            <div className="grid gap-4 p-6 sm:grid-cols-2">
+                <Field label="Applicant name">
+                    <input
+                        className={input}
+                        required
+                        value={draft.applicantName}
+                        onChange={(e) => set("applicantName", e.target.value)}
+                    />
+                </Field>
+                <Field label="Email">
+                    <input
+                        className={input}
+                        required
+                        type="email"
+                        value={draft.email}
+                        onChange={(e) => set("email", e.target.value)}
+                    />
+                </Field>
+                <Field label="Phone">
+                    <input
+                        className={input}
+                        required
+                        value={draft.phone}
+                        onChange={(e) => set("phone", e.target.value)}
+                    />
+                </Field>
+                <Field label="Passport number">
+                    <input
+                        className={input}
+                        required
+                        value={draft.passportNumber}
+                        onChange={(e) =>
+                            set("passportNumber", e.target.value.toUpperCase())
+                        }
+                    />
+                </Field>
+                <Field label="Destination">
+                    <input
+                        className={input}
+                        required
+                        value={draft.destinationCountry}
+                        onChange={(e) =>
+                            set("destinationCountry", e.target.value)
+                        }
+                    />
+                </Field>
+                <Field label="Visa type">
+                    <input
+                        className={input}
+                        required
+                        placeholder="Tourist Visa"
+                        value={draft.visaType}
+                        onChange={(e) => set("visaType", e.target.value)}
+                    />
+                </Field>
+                <Field label="Application status">
+                    <select
+                        className={`${input} capitalize`}
+                        value={draft.status}
+                        onChange={(e) =>
+                            set("status", e.target.value as VisaDraft["status"])
+                        }
+                    >
+                        {visaStatuses.map((v) => (
+                            <option key={v}>{v}</option>
+                        ))}
+                    </select>
+                </Field>
+                <Field label="Document status">
+                    <select
+                        className={`${input} capitalize`}
+                        value={draft.documentStatus}
+                        onChange={(e) =>
+                            set(
+                                "documentStatus",
+                                e.target.value as VisaDraft["documentStatus"],
+                            )
+                        }
+                    >
+                        {documentStatuses.map((v) => (
+                            <option key={v}>{v}</option>
+                        ))}
+                    </select>
+                </Field>
+                <Field label="Progress (%)">
+                    <input
+                        className={input}
+                        min="0"
+                        max="100"
+                        type="number"
+                        value={draft.progress}
+                        onChange={(e) =>
+                            set("progress", Number(e.target.value))
+                        }
+                    />
+                </Field>
+                <Field label="Application value (₹)">
+                    <input
+                        className={input}
+                        min="0"
+                        type="number"
+                        value={draft.applicationValue}
+                        onChange={(e) =>
+                            set("applicationValue", Number(e.target.value))
+                        }
+                    />
+                </Field>
+                <Field label="Submitted on">
+                    <input
+                        className={input}
+                        type="date"
+                        value={draft.submittedAt}
+                        onChange={(e) => set("submittedAt", e.target.value)}
+                    />
+                </Field>
+                <div className="sm:col-span-2">
+                    <Field label="Notes">
+                        <textarea
+                            className={`${input} h-24 py-2`}
+                            value={draft.notes}
+                            onChange={(e) => set("notes", e.target.value)}
+                        />
+                    </Field>
+                </div>
+            </div>
+            <div className="flex justify-end gap-3 border-t bg-slate-50 px-6 py-4">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-lg border bg-white px-4 py-2 text-sm font-semibold"
+                >
+                    Cancel
+                </button>
+                <button
+                    disabled={saving}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                >
+                    {saving ? "Saving…" : "Create application"}
+                </button>
+            </div>
+        </form>
+    );
+}
+
+export function VisaManagement() {
+    const [items, setItems] = useState<VisaApplication[]>([]);
+    const [query, setQuery] = useState("");
+    const [filter, setFilter] = useState<VisaStatus | "all">("all");
+    const [adding, setAdding] = useState(false);
+    useEffect(() => {
+        fetch("/api/visas")
+            .then((r) => r.json())
+            .then((rows) => setItems(rows.map(normalizeVisa)));
+    }, []);
+    const shown = useMemo(
+        () =>
+            items.filter(
+                (v) =>
+                    (filter === "all" || v.status === filter) &&
+                    [
+                        v.applicantName,
+                        v.passportNumber,
+                        v.destinationCountry,
+                        v.visaType,
+                    ].some((x) =>
+                        x.toLowerCase().includes(query.toLowerCase()),
+                    ),
+            ),
+        [items, query, filter],
+    );
+    async function remove(item: VisaApplication) {
+        if (!window.confirm(`Delete ${item.applicantName}'s application?`))
+            return;
+        const response = await fetch(`/api/visas/${item.id}`, {
+            method: "DELETE",
+        });
+        if (response.ok) setItems((old) => old.filter((v) => v.id !== item.id));
+    }
+
+    return (
+        <main className="min-h-screen bg-slate-50 text-slate-900">
+            <header className="border-b bg-white px-5 py-5 sm:px-8">
+                <Link
+                    href="/"
+                    className="text-xs font-semibold uppercase tracking-[.18em] text-blue-600"
+                >
+                    TravelDesk / Admin
+                </Link>
+                <h1 className="mt-1 text-2xl font-bold">Visa applications</h1>
+            </header>
+            <div className="p-5 sm:p-8">
+                <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                    <div>
+                        <h2 className="text-xl font-bold">
+                            Application tracking
+                        </h2>
+                        <p className="mt-1 text-sm text-slate-500">
+                            Track documents and progress from draft to
+                            publication.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setAdding(true)}
+                        className="flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
+                    >
+                        <Plus className="size-4" />
+                        New application
+                    </button>
+                </div>
+                <section className="mb-6 grid gap-4 sm:grid-cols-4">
+                    {[
+                        { l: "Applications", v: items.length },
+                        {
+                            l: "In process",
+                            v: items.filter((x) => x.status === "processed")
+                                .length,
+                        },
+                        {
+                            l: "Documents verified",
+                            v: items.filter(
+                                (x) => x.documentStatus === "verified",
+                            ).length,
+                        },
+                        {
+                            l: "Published",
+                            v: items.filter((x) => x.status === "published")
+                                .length,
+                        },
+                    ].map((s) => (
+                        <div
+                            className="rounded-2xl border bg-white p-5 shadow-sm"
+                            key={s.l}
+                        >
+                            <p className="text-sm text-slate-500">{s.l}</p>
+                            <p className="mt-2 text-3xl font-bold">{s.v}</p>
+                        </div>
+                    ))}
+                </section>
+                <section className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+                    <div className="flex flex-col gap-3 border-b p-4 sm:flex-row">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-3 size-4 text-slate-400" />
+                            <input
+                                className={`${input} pl-9`}
+                                placeholder="Search applicant, passport, country, or visa…"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                            />
+                        </div>
+                        <select
+                            className={`${input} w-auto min-w-40 capitalize`}
+                            value={filter}
+                            onChange={(e) =>
+                                setFilter(e.target.value as VisaStatus | "all")
+                            }
+                        >
+                            <option value="all">All statuses</option>
+                            {visaStatuses.map((s) => (
+                                <option key={s}>{s}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[980px] text-left text-sm">
+                            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                                <tr>
+                                    <th className="px-5 py-3">Applicant</th>
+                                    <th className="px-5 py-3">Visa</th>
+                                    <th className="px-5 py-3">Status</th>
+                                    <th className="px-5 py-3">Documents</th>
+                                    <th className="px-5 py-3">Progress</th>
+                                    <th className="px-5 py-3">Created</th>
+                                    <th className="px-5 py-3 text-right">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y">
+                                {shown.map((item) => (
+                                    <tr
+                                        className="hover:bg-slate-50"
+                                        key={item.id}
+                                    >
+                                        <td className="px-5 py-4">
+                                            <p className="font-semibold">
+                                                {item.applicantName}
+                                            </p>
+                                            <p className="text-xs text-slate-500">
+                                                {item.passportNumber} ·{" "}
+                                                {item.email}
+                                            </p>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <p>{item.visaType}</p>
+                                            <p className="text-xs text-slate-500">
+                                                {item.destinationCountry}
+                                            </p>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <span
+                                                className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${statusColor[item.status]}`}
+                                            >
+                                                {item.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <span className="inline-flex items-center gap-1.5 capitalize text-slate-600">
+                                                <FileCheck2 className="size-4" />
+                                                {item.documentStatus}
+                                            </span>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-2 w-24 rounded-full bg-slate-100">
+                                                    <div
+                                                        className="h-2 rounded-full bg-blue-600"
+                                                        style={{
+                                                            width: `${item.progress}%`,
+                                                        }}
+                                                    />
+                                                </div>
+                                                <span className="text-xs font-semibold">
+                                                    {item.progress}%
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4 text-slate-500">
+                                            {new Date(
+                                                item.createdAt,
+                                            ).toLocaleDateString("en-IN", {
+                                                day: "numeric",
+                                                month: "short",
+                                                year: "numeric",
+                                            })}
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <div className="flex justify-end gap-1">
+                                                <Link
+                                                    title="View application"
+                                                    href={`/admin/visas/${item.id}`}
+                                                    className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
+                                                >
+                                                    <Eye className="size-4" />
+                                                </Link>
+                                                <Link
+                                                    title="Edit application"
+                                                    href={`/admin/visas/${item.id}?edit=1`}
+                                                    className="rounded-lg p-2 text-slate-400 hover:bg-amber-50 hover:text-amber-600"
+                                                >
+                                                    <Pencil className="size-4" />
+                                                </Link>
+                                                <button
+                                                    title="Delete application"
+                                                    onClick={() => remove(item)}
+                                                    className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                                                >
+                                                    <Trash2 className="size-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {shown.length === 0 && (
+                                    <tr>
+                                        <td
+                                            colSpan={7}
+                                            className="py-16 text-center text-slate-500"
+                                        >
+                                            No visa applications found.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="border-t px-5 py-3 text-sm text-slate-500">
+                        Showing {shown.length} of {items.length} applications
+                    </div>
+                </section>
+            </div>
+            {adding && (
+                <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-slate-950/55 p-4">
+                    <div className="my-4 w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+                        <div className="flex justify-between border-b px-6 py-5">
+                            <div>
+                                <h2 className="text-lg font-bold">
+                                    New visa application
+                                </h2>
+                                <p className="text-sm text-slate-500">
+                                    Create and begin tracking an application.
+                                </p>
+                            </div>
+                            <button onClick={() => setAdding(false)}>
+                                <X className="size-5" />
+                            </button>
+                        </div>
+                        <VisaForm
+                            initial={blank}
+                            onClose={() => setAdding(false)}
+                            onSaved={(item) => {
+                                setItems((old) => [item, ...old]);
+                                setAdding(false);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
+        </main>
+    );
+}
