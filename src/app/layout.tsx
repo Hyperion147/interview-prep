@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import "./globals.css";
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-slate-50">
-        <AdminSidebar />
+        <Suspense fallback={<div className="hidden lg:block lg:fixed lg:inset-y-0 lg:w-64 lg:bg-slate-950" />}>
+          <AdminSidebar />
+        </Suspense>
         <div className="min-w-0 lg:ml-64">{children}</div>
       </body>
     </html>
