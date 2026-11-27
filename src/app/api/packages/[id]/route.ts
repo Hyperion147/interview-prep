@@ -12,6 +12,7 @@ function updateValues(body: Record<string, unknown>) {
     const durationDays = Number(body.durationDays);
     const durationNights = Number(body.durationNights);
     const price = Number(body.price);
+    const rating = Number(body.rating ?? 4.5);
     if (!categories.includes(category) || !statuses.includes(status))
         throw new Error("Invalid category or status");
     if (
@@ -24,7 +25,9 @@ function updateValues(body: Record<string, unknown>) {
         !Number.isFinite(price) ||
         price < 0 ||
         durationDays < 1 ||
-        durationNights < 0
+        durationNights < 0 ||
+        rating < 0 ||
+        rating > 5
     )
         throw new Error("Invalid price or duration");
     return {
@@ -34,6 +37,22 @@ function updateValues(body: Record<string, unknown>) {
         state: String(body.state).trim(),
         city: String(body.city).trim(),
         description: String(body.description).trim(),
+        region: String(body.region ?? "India").trim(),
+        locationLabel: String(
+            body.locationLabel ?? `${String(body.city)}, ${String(body.state)}`,
+        ).trim(),
+        imageUrl: String(
+            body.imageUrl ??
+                "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?q=80&w=1200",
+        ).trim(),
+        hotel: String(body.hotel ?? "Premium accommodation").trim(),
+        rating: String(rating),
+        features: Array.isArray(body.features)
+            ? body.features
+                  .map(String)
+                  .map((value) => value.trim())
+                  .filter(Boolean)
+            : [],
         durationDays,
         durationNights,
         price: String(price),

@@ -39,6 +39,17 @@ function packageValues(body: Record<string, unknown>) {
         state: String(body.state).trim(),
         city: String(body.city).trim(),
         description: String(body.description).trim(),
+        region: String(body.region ?? "India").trim(),
+        locationLabel: String(
+            body.locationLabel ?? `${String(body.city)}, ${String(body.state)}`,
+        ).trim(),
+        imageUrl: String(
+            body.imageUrl ??
+                "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?q=80&w=1200",
+        ).trim(),
+        hotel: String(body.hotel ?? "Premium accommodation").trim(),
+        rating: String(Number(body.rating ?? 4.5)),
+        features: Array.isArray(body.features) ? body.features.map(String) : [],
         durationDays,
         durationNights,
         price: String(price),

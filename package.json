@@ -9,11 +9,6 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "db:seed": "tsx scripts/seed-leads.ts",
-    "db:seed:visas": "tsx scripts/seed-visas.ts",
-    "db:seed:packages": "tsx scripts/seed-packages.ts",
-    "db:seed:follow-ups": "tsx scripts/seed-follow-ups.ts",
     "auth:bootstrap-admin": "tsx scripts/bootstrap-admin.ts"
   },
   "dependencies": {

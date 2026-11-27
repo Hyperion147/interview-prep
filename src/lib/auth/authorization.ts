@@ -1,5 +1,6 @@
 import "server-only";
 import { eq } from "drizzle-orm";
+import { connection } from "next/server";
 import { db } from "@/db";
 import { admins, agents } from "@/db/schema/auth";
 import { hasSupabaseAuthConfig } from "@/lib/supabase/config";
@@ -14,6 +15,7 @@ export type StaffIdentity = {
 
 export async function getStaffIdentity(): Promise<StaffIdentity | null> {
     if (!hasSupabaseAuthConfig()) return null;
+    await connection();
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     if (!data.user) return null;
