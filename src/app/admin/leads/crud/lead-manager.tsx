@@ -18,6 +18,7 @@ import {
     type LeadDraft,
     type LeadStatus,
 } from "./types";
+import { SummaryChatBot } from "../chatbot/summary-chatbot";
 
 const emptyDraft: LeadDraft = {
     fullName: "",
@@ -312,6 +313,7 @@ export function LeadManager() {
                         Lead management
                     </h1>
                 </header>
+                <SummaryChatBot />
                 <div className="p-5 sm:p-8">
                     <section className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                         <div>

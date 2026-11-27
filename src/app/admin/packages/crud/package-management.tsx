@@ -643,7 +643,7 @@ export function PackageManagement() {
                 </section>
             </div>
             {editing && (
-                <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-slate-950/55 p-4">
+                <div className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-slate-950/55 pt-100">
                     <div className="my-4 w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
                         <div className="flex justify-between border-b px-6 py-5">
                             <div>
