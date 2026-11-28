@@ -12,10 +12,12 @@ import {
     UsersRound,
     Plane,
     ExternalLink,
+    Inbox,
 } from "lucide-react";
 
 const workspace = [
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
+    { href: "/admin/inbox", label: "Inbox", icon: Inbox },
     { href: "/admin/leads", label: "Leads", icon: UsersRound },
     { href: "/admin/follow-up", label: "Follow-ups", icon: CalendarClock },
     { href: "/admin/trips", label: "Trips", icon: Briefcase },

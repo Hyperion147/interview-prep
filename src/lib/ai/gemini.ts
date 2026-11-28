@@ -28,9 +28,12 @@ export async function askGemini({
 }) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
-    const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/interactions",
-        {
+    let lastError: Error | null = null;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        const response = await fetch(
+          "https://generativelanguage.googleapis.com/v1beta/interactions",
+          {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -52,13 +55,19 @@ export async function askGemini({
                     : {}),
             }),
             signal: AbortSignal.timeout(15_000),
-        },
-    );
-    if (!response.ok) {
-        const detail = await response.text().catch(() => "");
-        throw new Error(`Gemini request failed (${response.status}): ${detail.slice(0, 200)}`);
+          },
+        );
+        if (!response.ok) {
+            const detail = await response.text().catch(() => "");
+            throw new Error(`Gemini request failed (${response.status}): ${detail.slice(0, 200)}`);
+        }
+        const text = outputText((await response.json()) as InteractionResponse);
+        if (!text) throw new Error("Gemini returned an empty response");
+        return text;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error("Gemini request failed");
+        if (attempt < 2) await new Promise((resolve) => setTimeout(resolve, 300 * 2 ** attempt));
+      }
     }
-    const text = outputText((await response.json()) as InteractionResponse);
-    if (!text) throw new Error("Gemini returned an empty response");
-    return text;
+    throw lastError ?? new Error("Gemini request failed");
 }
