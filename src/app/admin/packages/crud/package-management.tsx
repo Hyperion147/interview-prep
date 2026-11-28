@@ -137,15 +137,23 @@ function PackageForm({
                                 city: "",
                             }));
                         }}
-                        options={packageCategories.map(value=>({value,label:value}))}
+                        options={packageCategories.map((value) => ({
+                            value,
+                            label: value,
+                        }))}
                     />
                 </Field>
                 <Field label="Status">
                     <SelectField
                         className="h-10 capitalize"
                         value={draft.status}
-                        onValueChange={(value) => set("status", value as PackageDraft["status"])}
-                        options={packageStatuses.map(value=>({value,label:value}))}
+                        onValueChange={(value) =>
+                            set("status", value as PackageDraft["status"])
+                        }
+                        options={packageStatuses.map((value) => ({
+                            value,
+                            label: value,
+                        }))}
                     />
                 </Field>
                 <Field label="Country">
@@ -501,8 +509,16 @@ export function PackageManagement() {
                         <SelectField
                             className="h-10 capitalize"
                             value={category}
-                            onValueChange={(value) => resetLocation(value as PackageCategory | "all")}
-                            options={[{value:"all",label:"All categories"},...packageCategories.map(value=>({value,label:value}))]}
+                            onValueChange={(value) =>
+                                resetLocation(value as PackageCategory | "all")
+                            }
+                            options={[
+                                { value: "all", label: "All categories" },
+                                ...packageCategories.map((value) => ({
+                                    value,
+                                    label: value,
+                                })),
+                            ]}
                         />
                         <SelectField
                             className="h-10"
@@ -512,7 +528,13 @@ export function PackageManagement() {
                                 setState("all");
                                 setCity("all");
                             }}
-                            options={[{value:"all",label:"All countries"},...countries.map(value=>({value,label:value}))]}
+                            options={[
+                                { value: "all", label: "All countries" },
+                                ...countries.map((value) => ({
+                                    value,
+                                    label: value,
+                                })),
+                            ]}
                         />
                         <SelectField
                             className="h-10"
@@ -521,13 +543,25 @@ export function PackageManagement() {
                                 setState(value);
                                 setCity("all");
                             }}
-                            options={[{value:"all",label:"All states"},...states.map(value=>({value,label:value}))]}
+                            options={[
+                                { value: "all", label: "All states" },
+                                ...states.map((value) => ({
+                                    value,
+                                    label: value,
+                                })),
+                            ]}
                         />
                         <SelectField
                             className="h-10"
                             value={city}
                             onValueChange={setCity}
-                            options={[{value:"all",label:"All cities"},...cities.map(value=>({value,label:value}))]}
+                            options={[
+                                { value: "all", label: "All cities" },
+                                ...cities.map((value) => ({
+                                    value,
+                                    label: value,
+                                })),
+                            ]}
                         />
                     </div>
                 </section>

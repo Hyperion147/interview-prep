@@ -4,6 +4,7 @@ import { AdminSidebar } from "@/components/admin-sidebar";
 import { getStaffIdentity } from "@/lib/auth/authorization";
 import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseAuthConfig } from "@/lib/supabase/config";
+import { connection } from "next/server";
 
 export const instant = false;
 
@@ -13,6 +14,7 @@ export default async function AdminLayout({
     children: React.ReactNode;
 }) {
     const configured = hasSupabaseAuthConfig();
+    if (configured) await connection();
     const identity = configured ? await getStaffIdentity() : null;
     if (configured && !identity) {
         // Distinguish signed-out visitors from customers who are signed in but

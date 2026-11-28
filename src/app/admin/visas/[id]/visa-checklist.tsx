@@ -14,7 +14,14 @@ const statuses:ChecklistItem["status"][]=["missing","uploaded","under_review","a
 export function VisaChecklist({applicationId,onProgressChanged}:{applicationId:string;onProgressChanged?:()=>void}){
   const [items,setItems]=useState<ChecklistItem[]>([]); const [loading,setLoading]=useState(true); const [adding,setAdding]=useState(false);
   const load=useCallback(async()=>{const response=await adminRequest(`/api/visas/${applicationId}/workflow`);if(response.ok)setItems(await response.json());setLoading(false)},[applicationId]);
-  useEffect(()=>{const controller=new AbortController();adminRequest(`/api/visas/${applicationId}/workflow`,{signal:controller.signal}).then(async response=>{if(response.ok){const rows=await response.json();if(!controller.signal.aborted)setItems(rows)}}).finally(()=>{if(!controller.signal.aborted)setLoading(false)});return()=>controller.abort()},[applicationId]);
+  useEffect(()=>{
+    const controller=new AbortController();
+    adminRequest(`/api/visas/${applicationId}/workflow`,{signal:controller.signal})
+      .then(async response=>{if(response.ok){const rows=await response.json();if(!controller.signal.aborted)setItems(rows)}})
+      .catch((error:unknown)=>{if(!controller.signal.aborted)console.error("Could not load visa checklist",error)})
+      .finally(()=>{if(!controller.signal.aborted)setLoading(false)});
+    return()=>controller.abort("Visa checklist effect cleanup")
+  },[applicationId]);
   async function add(formData:FormData){const label=String(formData.get("label")??"");const dueAt=String(formData.get("dueAt")??"");const response=await adminRequest(`/api/visas/${applicationId}/workflow`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({label,dueAt:dueAt||null})});if(response.ok){setAdding(false);await load()}}
   async function update(item:ChecklistItem,status:ChecklistItem["status"]){const response=await adminRequest(`/api/visas/${applicationId}/workflow`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({itemId:item.id,status,rejectionReason:status==="rejected"?"Please provide a complete, legible document.":null})});if(response.ok){await load();onProgressChanged?.()}}
   const approved=items.filter(i=>i.status==="approved"||i.status==="not_required").length;

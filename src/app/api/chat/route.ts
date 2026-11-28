@@ -63,9 +63,7 @@ async function identifyVisitor() {
         identityKey: authUserId
             ? `user:${authUserId}:device:${deviceId}`
             : `guest:device:${deviceId}`,
-        limit: authUserId
-            ? AUTHENTICATED_DAILY_LIMIT
-            : ANONYMOUS_DAILY_LIMIT,
+        limit: authUserId ? AUTHENTICATED_DAILY_LIMIT : ANONYMOUS_DAILY_LIMIT,
     };
 }
 
@@ -232,8 +230,7 @@ Customer: ${message}`;
                     "x-goog-api-key": process.env.GEMINI_API_KEY,
                 },
                 body: JSON.stringify({
-                    model:
-                        process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite",
+                    model: process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite",
                     input,
                     ...(interactionId
                         ? { previous_interaction_id: interactionId }

@@ -30,7 +30,7 @@ function VisaApplicationDetails() {
       })
       .then((row) => { if (!controller.signal.aborted) setApplication(normalizeVisa(row)); })
       .catch(() => { if (!controller.signal.aborted) setError("Could not load this application."); });
-    return () => controller.abort();
+    return () => controller.abort("Visa detail effect cleanup");
   }, [id]);
   async function save() {
     if (!application) return;

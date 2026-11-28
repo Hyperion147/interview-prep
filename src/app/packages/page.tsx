@@ -110,7 +110,7 @@ export default function Packages() {
             .finally(() => {
                 if (!controller.signal.aborted) setLoading(false);
             });
-        return () => controller.abort();
+        return () => controller.abort("Package list effect cleanup");
     }, []);
 
     const regions = useMemo(

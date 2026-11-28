@@ -3,7 +3,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SelectField } from "@/components/ui/select-field";
 
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
@@ -98,7 +105,9 @@ function LeadForm({
         try {
             await onSave(draft);
         } catch (err) {
-            setError(err instanceof Error ? err.message : "Failed to save lead");
+            setError(
+                err instanceof Error ? err.message : "Failed to save lead",
+            );
             setSaving(false);
         }
     }
@@ -146,17 +155,27 @@ function LeadForm({
                 <Field label="Status">
                     <SelectField
                         className="h-10"
-                        onValueChange={(value) => set("status", value as LeadStatus)}
+                        onValueChange={(value) =>
+                            set("status", value as LeadStatus)
+                        }
                         value={draft.status}
-                        options={leadStatuses.map(value=>({value,label:labels[value]}))}
+                        options={leadStatuses.map((value) => ({
+                            value,
+                            label: labels[value],
+                        }))}
                     />
                 </Field>
                 <Field label="Lead source">
                     <SelectField
                         className="h-10"
-                        onValueChange={(value) => set("source", value as LeadDraft["source"])}
+                        onValueChange={(value) =>
+                            set("source", value as LeadDraft["source"])
+                        }
                         value={draft.source}
-                        options={leadSources.map(value=>({value,label:value.replaceAll("_"," ")}))}
+                        options={leadSources.map((value) => ({
+                            value,
+                            label: value.replaceAll("_", " "),
+                        }))}
                     />
                 </Field>
                 <Field label="Number of travelers">
@@ -281,9 +300,10 @@ export function LeadManager() {
     const [globalAutomation, setGlobalAutomation] = useState(true);
     useEffect(() => {
         fetch("/api/whatsapp/settings")
-            .then((response) => response.ok ? response.json() : null)
+            .then((response) => (response.ok ? response.json() : null))
             .then((settings) => {
-                if (settings) setGlobalAutomation(settings.whatsappAutoReplyEnabled);
+                if (settings)
+                    setGlobalAutomation(settings.whatsappAutoReplyEnabled);
             });
     }, []);
     const filtered = useMemo(
@@ -311,259 +331,309 @@ export function LeadManager() {
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900">
             <header className="border-b border-slate-200 bg-white px-5 py-5 sm:px-8">
-                    <p className="text-xs font-semibold uppercase tracking-[.18em] text-blue-600">
-                        CRM
-                    </p>
-                    <h1 className="mt-1 text-2xl font-bold text-slate-950">
-                        Lead management
-                    </h1>
-                </header>
-                <div className="p-5 sm:p-8">
-                    <section className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-                        <div>
-                            <h2 className="text-xl font-bold">
-                                Your sales pipeline
-                            </h2>
-                            <p className="mt-1 text-sm text-slate-500">
-                                Create, qualify, and track every travel enquiry.
-                            </p>
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                            <Button variant="outline" onClick={async () => {
+                <p className="text-xs font-semibold uppercase tracking-[.18em] text-blue-600">
+                    CRM
+                </p>
+                <h1 className="mt-1 text-2xl font-bold text-slate-950">
+                    Lead management
+                </h1>
+            </header>
+            <div className="p-5 sm:p-8">
+                <section className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                    <div>
+                        <h2 className="text-xl font-bold">
+                            Your sales pipeline
+                        </h2>
+                        <p className="mt-1 text-sm text-slate-500">
+                            Create, qualify, and track every travel enquiry.
+                        </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={async () => {
                                 const enabled = !globalAutomation;
-                                const response = await fetch("/api/whatsapp/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ enabled }) });
+                                const response = await fetch(
+                                    "/api/whatsapp/settings",
+                                    {
+                                        method: "PATCH",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                        },
+                                        body: JSON.stringify({ enabled }),
+                                    },
+                                );
                                 if (response.ok) setGlobalAutomation(enabled);
-                            }}>
-                                {globalAutomation ? <PauseCircle /> : <PlayCircle />}
-                                {globalAutomation ? "Pause AI replies" : "Resume AI replies"}
-                            </Button>
-                            <Button
-                                className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
-                                onClick={() => setEditing("new")}
-                            >
-                                <Plus className="size-4" /> Add lead
-                            </Button>
-                        </div>
-                    </section>
+                            }}
+                        >
+                            {globalAutomation ? (
+                                <PauseCircle />
+                            ) : (
+                                <PlayCircle />
+                            )}
+                            {globalAutomation
+                                ? "Pause AI replies"
+                                : "Resume AI replies"}
+                        </Button>
+                        <Button
+                            className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+                            onClick={() => setEditing("new")}
+                        >
+                            <Plus className="size-4" /> Add lead
+                        </Button>
+                    </div>
+                </section>
 
-                    <section className="mb-6 grid gap-4 sm:grid-cols-3">
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                            <p className="text-sm text-slate-500">
-                                Total leads
-                            </p>
-                            <p className="mt-2 text-3xl font-bold">
-                                {leads.length}
-                            </p>
+                <section className="mb-6 grid gap-4 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <p className="text-sm text-slate-500">Total leads</p>
+                        <p className="mt-2 text-3xl font-bold">
+                            {leads.length}
+                        </p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <p className="text-sm text-slate-500">
+                            Qualified leads
+                        </p>
+                        <p className="mt-2 text-3xl font-bold">
+                            {
+                                leads.filter(
+                                    (lead) => lead.status === "qualified",
+                                ).length
+                            }
+                        </p>
+                    </div>
+                    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                        <p className="text-sm text-slate-500">Pipeline value</p>
+                        <p className="mt-2 text-3xl font-bold">
+                            ₹{pipelineValue.toLocaleString("en-IN")}
+                        </p>
+                    </div>
+                </section>
+
+                <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                            <Input
+                                aria-label="Search leads"
+                                className={`${inputClass} pl-9`}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Search name, email, phone, or destination…"
+                                value={search}
+                            />
                         </div>
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                            <p className="text-sm text-slate-500">
-                                Qualified leads
-                            </p>
-                            <p className="mt-2 text-3xl font-bold">
-                                {
-                                    leads.filter(
-                                        (lead) => lead.status === "qualified",
-                                    ).length
+                        <div>
+                            <SelectField
+                                aria-label="Filter by status"
+                                className="h-10 min-w-44 capitalize"
+                                onValueChange={(value) =>
+                                    setStatus(value as LeadStatus | "all")
                                 }
-                            </p>
+                                value={status}
+                                options={[
+                                    { value: "all", label: "All statuses" },
+                                    ...leadStatuses.map((value) => ({
+                                        value,
+                                        label: labels[value],
+                                    })),
+                                ]}
+                            />
                         </div>
-                        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                            <p className="text-sm text-slate-500">
-                                Pipeline value
-                            </p>
-                            <p className="mt-2 text-3xl font-bold">
-                                ₹{pipelineValue.toLocaleString("en-IN")}
-                            </p>
-                        </div>
-                    </section>
-
-                    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                        <div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
-                                <Input
-                                    aria-label="Search leads"
-                                    className={`${inputClass} pl-9`}
-                                    onChange={(e) => setSearch(e.target.value)}
-                                    placeholder="Search name, email, phone, or destination…"
-                                    value={search}
-                                />
-                            </div>
-                            <div>
-                                <SelectField
-                                    aria-label="Filter by status"
-                                    className="h-10 min-w-44 capitalize"
-                                    onValueChange={(value) => setStatus(value as LeadStatus | "all")}
-                                    value={status}
-                                    options={[{value:"all",label:"All statuses"},...leadStatuses.map(value=>({value,label:labels[value]}))]}
-                                />
-                            </div>
-                            <Button variant={reviewOnly ? "default" : "outline"} onClick={() => setReviewOnly((current) => !current)}>
-                                <AlertTriangle /> Needs review
-                            </Button>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <Table className="w-full min-w-[940px] text-left text-sm">
-                                <TableHeader className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
-                                    <TableRow>
-                                        <TableHead className="px-5 py-3 font-semibold">
-                                            Lead
-                                        </TableHead>
-                                        <TableHead className="px-5 py-3 font-semibold">
-                                            Destination
-                                        </TableHead>
-                                        <TableHead className="px-5 py-3 font-semibold">
-                                            Status
-                                        </TableHead>
-                                        <TableHead className="px-5 py-3 font-semibold">
-                                            Value
-                                        </TableHead>
-                                        <TableHead className="px-5 py-3 font-semibold">
-                                            Follow-up
-                                        </TableHead>
-                                        <TableHead className="px-5 py-3 text-right font-semibold">
-                                            Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody className="divide-y divide-slate-100">
-                                    {filtered.map((lead) => (
-                                        <TableRow
-                                            className="hover:bg-slate-50/70"
-                                            key={lead.id}
-                                        >
-                                            <TableCell className="px-5 py-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="grid size-10 place-items-center rounded-full bg-blue-50 font-bold text-blue-700">
-                                                        {lead.fullName
-                                                            .split(" ")
-                                                            .map(
-                                                                (part) =>
-                                                                    part[0],
-                                                            )
-                                                            .slice(0, 2)
-                                                            .join("")}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-semibold text-slate-900">
-                                                            {lead.fullName}
-                                                            {lead.unreadWhatsApp > 0 && <span className="ml-2 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] text-white">{lead.unreadWhatsApp} new</span>}
-                                                        </p>
-                                                        <p className="text-xs text-slate-500">
-                                                            {lead.email} ·{" "}
-                                                            {lead.phone}
-                                                        </p>
-                                                        {lead.lastWhatsAppMessage && <p className="mt-1 max-w-64 truncate text-xs text-emerald-700">{lead.lastWhatsAppMessage}</p>}
-                                                    </div>
+                        <Button
+                            variant={reviewOnly ? "default" : "outline"}
+                            onClick={() => setReviewOnly((current) => !current)}
+                        >
+                            <AlertTriangle /> Needs review
+                        </Button>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <Table className="w-full min-w-[940px] text-left text-sm">
+                            <TableHeader className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                                <TableRow>
+                                    <TableHead className="px-5 py-3 font-semibold">
+                                        Lead
+                                    </TableHead>
+                                    <TableHead className="px-5 py-3 font-semibold">
+                                        Destination
+                                    </TableHead>
+                                    <TableHead className="px-5 py-3 font-semibold">
+                                        Status
+                                    </TableHead>
+                                    <TableHead className="px-5 py-3 font-semibold">
+                                        Value
+                                    </TableHead>
+                                    <TableHead className="px-5 py-3 font-semibold">
+                                        Follow-up
+                                    </TableHead>
+                                    <TableHead className="px-5 py-3 text-right font-semibold">
+                                        Actions
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody className="divide-y divide-slate-100">
+                                {filtered.map((lead) => (
+                                    <TableRow
+                                        className="hover:bg-slate-50/70"
+                                        key={lead.id}
+                                    >
+                                        <TableCell className="px-5 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="grid size-10 place-items-center rounded-full bg-blue-50 font-bold text-blue-700">
+                                                    {lead.fullName
+                                                        .split(" ")
+                                                        .map((part) => part[0])
+                                                        .slice(0, 2)
+                                                        .join("")}
                                                 </div>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4">
-                                                <p className="font-medium">
-                                                    {lead.destination}
-                                                </p>
-                                                <p className="text-xs capitalize text-slate-500">
-                                                    {lead.travelers} traveler
-                                                    {lead.travelers === 1
-                                                        ? ""
-                                                        : "s"}{" "}
-                                                    ·{" "}
-                                                    {lead.source.replaceAll(
-                                                        "_",
-                                                        " ",
+                                                <div>
+                                                    <p className="font-semibold text-slate-900">
+                                                        {lead.fullName}
+                                                        {lead.unreadWhatsApp >
+                                                            0 && (
+                                                            <span className="ml-2 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] text-white">
+                                                                {
+                                                                    lead.unreadWhatsApp
+                                                                }{" "}
+                                                                new
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500">
+                                                        {lead.email} ·{" "}
+                                                        {lead.phone}
+                                                    </p>
+                                                    {lead.lastWhatsAppMessage && (
+                                                        <p className="mt-1 max-w-64 truncate text-xs text-emerald-700">
+                                                            {
+                                                                lead.lastWhatsAppMessage
+                                                            }
+                                                        </p>
                                                     )}
-                                                </p>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4">
-                                                <span
-                                                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${statusStyles[lead.status]}`}
-                                                >
-                                                    {labels[lead.status]}
-                                                </span>
-                                                <div className="mt-2 flex gap-1">
-                                                    {lead.handoffRequired && <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">Review</span>}
-                                                    {lead.aiPriority && <span className="rounded bg-violet-50 px-1.5 py-0.5 text-[10px] font-semibold capitalize text-violet-700">{lead.aiPriority}</span>}
-                                                    {lead.whatsappDeliveryFailed && <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">Delivery failed</span>}
                                                 </div>
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 font-semibold">
-                                                ₹
-                                                {lead.estimatedValue.toLocaleString(
-                                                    "en-IN",
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4">
+                                            <p className="font-medium">
+                                                {lead.destination}
+                                            </p>
+                                            <p className="text-xs capitalize text-slate-500">
+                                                {lead.travelers} traveler
+                                                {lead.travelers === 1
+                                                    ? ""
+                                                    : "s"}{" "}
+                                                ·{" "}
+                                                {lead.source.replaceAll(
+                                                    "_",
+                                                    " ",
                                                 )}
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4 text-slate-600">
-                                                {lead.nextFollowUpAt
-                                                    ? new Intl.DateTimeFormat(
-                                                          "en-IN",
-                                                          {
-                                                              day: "numeric",
-                                                              month: "short",
-                                                              year: "numeric",
-                                                          },
-                                                      ).format(
-                                                          new Date(
-                                                              `${lead.nextFollowUpAt}T00:00:00`,
-                                                          ),
-                                                      )
-                                                    : "Not scheduled"}
-                                            </TableCell>
-                                            <TableCell className="px-5 py-4">
-                                                <div className="flex justify-end gap-1">
-                                                    <Button
-                                                        aria-label={`Open WhatsApp automation for ${lead.fullName}`}
-                                                        className="rounded-lg p-2 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
-                                                        onClick={() => setAutomating(lead)}
-                                                    >
-                                                        <MessageCircle className="size-4" />
-                                                    </Button>
-                                                    <Button
-                                                        aria-label={`Edit ${lead.fullName}`}
-                                                        className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
-                                                        onClick={() =>
-                                                            setEditing(lead)
-                                                        }
-                                                    >
-                                                        <Pencil className="size-4" />
-                                                    </Button>
-                                                    <Button
-                                                        aria-label={`Delete ${lead.fullName}`}
-                                                        className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                                                        onClick={() => {
-                                                            setDeleteError(null);
-                                                            setDeleting(lead);
-                                                        }}
-                                                    >
-                                                        <Trash2 className="size-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {filtered.length === 0 && (
-                                        <TableRow>
-                                            <TableCell
-                                                className="px-5 py-16 text-center"
-                                                colSpan={6}
+                                            </p>
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4">
+                                            <span
+                                                className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${statusStyles[lead.status]}`}
                                             >
-                                                <UserRound className="mx-auto size-8 text-slate-300" />
-                                                <p className="mt-3 font-semibold text-slate-700">
-                                                    No leads found
-                                                </p>
-                                                <p className="mt-1 text-sm text-slate-500">
-                                                    Try changing your search or
-                                                    status filter.
-                                                </p>
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
-                        <div className="border-t border-slate-100 px-5 py-3 text-sm text-slate-500">
-                            Showing {filtered.length} of {leads.length} leads
-                        </div>
-                    </section>
-                </div>
+                                                {labels[lead.status]}
+                                            </span>
+                                            <div className="mt-2 flex gap-1">
+                                                {lead.handoffRequired && (
+                                                    <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">
+                                                        Review
+                                                    </span>
+                                                )}
+                                                {lead.aiPriority && (
+                                                    <span className="rounded bg-violet-50 px-1.5 py-0.5 text-[10px] font-semibold capitalize text-violet-700">
+                                                        {lead.aiPriority}
+                                                    </span>
+                                                )}
+                                                {lead.whatsappDeliveryFailed && (
+                                                    <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">
+                                                        Delivery failed
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4 font-semibold">
+                                            ₹
+                                            {lead.estimatedValue.toLocaleString(
+                                                "en-IN",
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4 text-slate-600">
+                                            {lead.nextFollowUpAt
+                                                ? new Intl.DateTimeFormat(
+                                                      "en-IN",
+                                                      {
+                                                          day: "numeric",
+                                                          month: "short",
+                                                          year: "numeric",
+                                                      },
+                                                  ).format(
+                                                      new Date(
+                                                          `${lead.nextFollowUpAt}T00:00:00`,
+                                                      ),
+                                                  )
+                                                : "Not scheduled"}
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4">
+                                            <div className="flex justify-end gap-1">
+                                                <Button
+                                                    aria-label={`Open WhatsApp automation for ${lead.fullName}`}
+                                                    className="rounded-lg p-2 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
+                                                    onClick={() =>
+                                                        setAutomating(lead)
+                                                    }
+                                                >
+                                                    <MessageCircle className="size-4" />
+                                                </Button>
+                                                <Button
+                                                    aria-label={`Edit ${lead.fullName}`}
+                                                    className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
+                                                    onClick={() =>
+                                                        setEditing(lead)
+                                                    }
+                                                >
+                                                    <Pencil className="size-4" />
+                                                </Button>
+                                                <Button
+                                                    aria-label={`Delete ${lead.fullName}`}
+                                                    className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                                                    onClick={() => {
+                                                        setDeleteError(null);
+                                                        setDeleting(lead);
+                                                    }}
+                                                >
+                                                    <Trash2 className="size-4" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {filtered.length === 0 && (
+                                    <TableRow>
+                                        <TableCell
+                                            className="px-5 py-16 text-center"
+                                            colSpan={6}
+                                        >
+                                            <UserRound className="mx-auto size-8 text-slate-300" />
+                                            <p className="mt-3 font-semibold text-slate-700">
+                                                No leads found
+                                            </p>
+                                            <p className="mt-1 text-sm text-slate-500">
+                                                Try changing your search or
+                                                status filter.
+                                            </p>
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                    <div className="border-t border-slate-100 px-5 py-3 text-sm text-slate-500">
+                        Showing {filtered.length} of {leads.length} leads
+                    </div>
+                </section>
+            </div>
 
             {editing && (
                 <Dialog
@@ -586,7 +656,12 @@ export function LeadManager() {
                     />
                 </Dialog>
             )}
-            {automating && <LeadAutomationPanel lead={automating} onClose={() => setAutomating(null)} />}
+            {automating && (
+                <LeadAutomationPanel
+                    lead={automating}
+                    onClose={() => setAutomating(null)}
+                />
+            )}
             {deleting && (
                 <Dialog
                     onClose={() => setDeleting(null)}

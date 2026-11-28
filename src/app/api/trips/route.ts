@@ -72,17 +72,15 @@ export async function POST(request: Request) {
                         channel: "email",
                     })
                     .returning({ id: followUps.id });
-                await tx
-                    .insert(tripWorkflow)
-                    .values({
-                        leadId: id,
-                        customerEmail: lead.email.trim().toLowerCase(),
-                        itinerary,
-                        total,
-                        dueAt,
-                        stage: "proposed",
-                        reminderId: reminder.id,
-                    });
+                await tx.insert(tripWorkflow).values({
+                    leadId: id,
+                    customerEmail: lead.email.trim().toLowerCase(),
+                    itinerary,
+                    total,
+                    dueAt,
+                    stage: "proposed",
+                    reminderId: reminder.id,
+                });
                 await tx
                     .update(leads)
                     .set({

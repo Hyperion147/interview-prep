@@ -8,8 +8,12 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TripActions } from "@/components/trip-actions";
+import { connection } from "next/server";
+
+export const instant = false;
 
 async function CustomerTrips() {
+    await connection();
     const { data } = await (await createClient()).auth.getUser();
     if (!data.user?.email || !data.user.email_confirmed_at)
         return (
