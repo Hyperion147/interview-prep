@@ -13,7 +13,7 @@ export default async function AdminLayout({
 }) {
     const configured = hasSupabaseAuthConfig();
     const identity = configured ? await getStaffIdentity() : null;
-    if (configured && !identity) redirect("/auth/login");
+    if (configured && !identity) redirect("/auth/login?audience=staff");
     return (
         <div className="crm-workspace min-h-screen bg-slate-50 lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]">
             <Suspense

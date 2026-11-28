@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FaAngleRight, FaArrowRight } from "react-icons/fa6";
+import { signOut } from "@/app/auth/actions";
 
 type NavbarProps = {
     accountHref?: string;
@@ -13,6 +14,7 @@ const Navbar = ({
     accountHref = "/auth/login",
     accountLabel = "Sign In",
 }: NavbarProps) => {
+    const authenticated = Boolean(accountHref && accountHref !== "/auth/login");
     const [isDestinationsOpen, setIsDestinationsOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -157,6 +159,7 @@ const Navbar = ({
                     >
                         {accountLabel}
                     </Link>
+                    {authenticated && <form action={signOut}><button className="text-sm font-medium text-primary/70 transition hover:text-primary">Sign out</button></form>}
                 </div>
 
                 {/* Mobile Menu Toggle */}
@@ -279,6 +282,7 @@ const Navbar = ({
                         >
                             {accountLabel}
                         </Link>
+                        {authenticated && <form action={signOut} className="mt-3 text-center"><button className="text-sm font-semibold text-foreground/60">Sign out</button></form>}
                     </div>
                 </div>
             </div>

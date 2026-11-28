@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
     const destination = url.searchParams.get("next");
-    const next = destination === "/enquire" || destination === "/trips" ? destination : "/";
+    const next = destination && ["/", "/enquire", "/trips", "/portal"].includes(destination) ? destination : "/";
     if (!code)
         return NextResponse.redirect(
             new URL("/auth/login?error=Missing+OAuth+code", url.origin),
