@@ -54,12 +54,19 @@ export async function captureEnquiry(
                       nextFollowUpAt: due,
                   })
                   .returning();
-        const [openWhatsAppTask] = handoff ? await tx.select({ id: followUps.id }).from(followUps)
-            .where(and(
-                eq(followUps.leadId, created.id),
-                eq(followUps.channel, "whatsapp"),
-                inArray(followUps.status, ["scheduled", "missed"]),
-            )).limit(1) : [];
+        const [openWhatsAppTask] = handoff
+            ? await tx
+                  .select({ id: followUps.id })
+                  .from(followUps)
+                  .where(
+                      and(
+                          eq(followUps.leadId, created.id),
+                          eq(followUps.channel, "whatsapp"),
+                          inArray(followUps.status, ["scheduled", "missed"]),
+                      ),
+                  )
+                  .limit(1)
+            : [];
         if ((!existing || handoff || !eventId) && !openWhatsAppTask) {
             await tx.insert(followUps).values({
                 leadId: created.id,

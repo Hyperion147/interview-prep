@@ -66,7 +66,9 @@ export function parsePackageInput(value: unknown) {
 
     const features = Array.isArray(body.features)
         ? body.features
-              .filter((feature): feature is string => typeof feature === "string")
+              .filter(
+                  (feature): feature is string => typeof feature === "string",
+              )
               .map((feature) => feature.trim())
               .filter(Boolean)
         : [];
@@ -79,11 +81,7 @@ export function parsePackageInput(value: unknown) {
         city: requiredString(body, "city", "City"),
         description: requiredString(body, "description", "Description"),
         region: requiredString(body, "region", "Display region"),
-        locationLabel: requiredString(
-            body,
-            "locationLabel",
-            "Location label",
-        ),
+        locationLabel: requiredString(body, "locationLabel", "Location label"),
         imageUrl,
         hotel: requiredString(body, "hotel", "Hotel or accommodation"),
         rating: String(rating),
