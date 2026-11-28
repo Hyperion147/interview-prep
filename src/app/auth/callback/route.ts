@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { users } from "@/db/schema/auth";
+import { safeRedirectPath } from "@/lib/auth/redirects";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
     const destination = url.searchParams.get("next");
-    const next = destination && ["/", "/enquire", "/trips", "/portal"].includes(destination) ? destination : "/";
+    const next = safeRedirectPath(destination, "/");
     if (!code)
         return NextResponse.redirect(
             new URL("/auth/login?error=Missing+OAuth+code", url.origin),

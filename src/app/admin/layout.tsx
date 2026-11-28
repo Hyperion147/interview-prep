@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { AdminSidebar } from "@/components/admin-sidebar";
 import { getStaffIdentity } from "@/lib/auth/authorization";
+import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseAuthConfig } from "@/lib/supabase/config";
 
 export const instant = false;
@@ -13,7 +14,13 @@ export default async function AdminLayout({
 }) {
     const configured = hasSupabaseAuthConfig();
     const identity = configured ? await getStaffIdentity() : null;
-    if (configured && !identity) redirect("/auth/login?audience=staff");
+    if (configured && !identity) {
+        // Distinguish signed-out visitors from customers who are signed in but
+        // do not have a staff account, so they are not trapped on the staff
+        // login screen.
+        const { data } = await (await createClient()).auth.getUser();
+        redirect(data.user ? "/portal" : "/auth/login?audience=staff");
+    }
     return (
         <div className="crm-workspace min-h-screen bg-slate-50 lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]">
             <Suspense
