@@ -1,6 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { SelectField } from "@/components/ui/select-field";
 
 import { adminRequest as fetch } from "@/lib/crm/admin-request";
 
@@ -139,33 +140,20 @@ function VisaForm({
                     />
                 </Field>
                 <Field label="Application status">
-                    <select
-                        className={`${input} capitalize`}
+                    <SelectField
+                        className="h-10 capitalize"
                         value={draft.status}
-                        onChange={(e) =>
-                            set("status", e.target.value as VisaDraft["status"])
-                        }
-                    >
-                        {visaStatuses.map((v) => (
-                            <option key={v}>{v}</option>
-                        ))}
-                    </select>
+                        onValueChange={(value) => set("status", value as VisaDraft["status"])}
+                        options={visaStatuses.map(value=>({value,label:value}))}
+                    />
                 </Field>
                 <Field label="Document status">
-                    <select
-                        className={`${input} capitalize`}
+                    <SelectField
+                        className="h-10 capitalize"
                         value={draft.documentStatus}
-                        onChange={(e) =>
-                            set(
-                                "documentStatus",
-                                e.target.value as VisaDraft["documentStatus"],
-                            )
-                        }
-                    >
-                        {documentStatuses.map((v) => (
-                            <option key={v}>{v}</option>
-                        ))}
-                    </select>
+                        onValueChange={(value) => set("documentStatus", value as VisaDraft["documentStatus"])}
+                        options={documentStatuses.map(value=>({value,label:value}))}
+                    />
                 </Field>
                 <Field label="Progress (%)">
                     <Input
@@ -333,18 +321,12 @@ export function VisaManagement() {
                                 onChange={(e) => setQuery(e.target.value)}
                             />
                         </div>
-                        <select
-                            className={`${input} w-auto min-w-40 capitalize`}
+                        <SelectField
+                            className="h-10 min-w-40 capitalize"
                             value={filter}
-                            onChange={(e) =>
-                                setFilter(e.target.value as VisaStatus | "all")
-                            }
-                        >
-                            <option value="all">All statuses</option>
-                            {visaStatuses.map((s) => (
-                                <option key={s}>{s}</option>
-                            ))}
-                        </select>
+                            onValueChange={(value) => setFilter(value as VisaStatus | "all")}
+                            options={[{value:"all",label:"All statuses"},...visaStatuses.map(value=>({value,label:value}))]}
+                        />
                     </div>
                     <div className="overflow-x-auto">
                         <Table className="w-full min-w-[980px] text-left text-sm">

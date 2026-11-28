@@ -1,6 +1,7 @@
 "use client";
 import { AdminSkeleton } from "@/components/admin-skeleton";
 import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select-field";
 import { Textarea } from "@/components/ui/textarea";
 
 import { adminRequest as fetch } from "@/lib/crm/admin-request";
@@ -123,11 +124,11 @@ function PackageForm({
                     </Field>
                 </div>
                 <Field label="Category">
-                    <select
-                        className={`${input} capitalize`}
+                    <SelectField
+                        className="h-10 capitalize"
                         value={draft.category}
-                        onChange={(e) => {
-                            const category = e.target.value as PackageCategory;
+                        onValueChange={(value) => {
+                            const category = value as PackageCategory;
                             setDraft((old) => ({
                                 ...old,
                                 category,
@@ -136,27 +137,16 @@ function PackageForm({
                                 city: "",
                             }));
                         }}
-                    >
-                        {packageCategories.map((value) => (
-                            <option key={value}>{value}</option>
-                        ))}
-                    </select>
+                        options={packageCategories.map(value=>({value,label:value}))}
+                    />
                 </Field>
                 <Field label="Status">
-                    <select
-                        className={`${input} capitalize`}
+                    <SelectField
+                        className="h-10 capitalize"
                         value={draft.status}
-                        onChange={(e) =>
-                            set(
-                                "status",
-                                e.target.value as PackageDraft["status"],
-                            )
-                        }
-                    >
-                        {packageStatuses.map((value) => (
-                            <option key={value}>{value}</option>
-                        ))}
-                    </select>
+                        onValueChange={(value) => set("status", value as PackageDraft["status"])}
+                        options={packageStatuses.map(value=>({value,label:value}))}
+                    />
                 </Field>
                 <Field label="Country">
                     <Input
@@ -508,57 +498,37 @@ export function PackageManagement() {
                                 placeholder="Search packages or destinations…"
                             />
                         </div>
-                        <select
-                            className={`${input} capitalize`}
+                        <SelectField
+                            className="h-10 capitalize"
                             value={category}
-                            onChange={(e) =>
-                                resetLocation(
-                                    e.target.value as PackageCategory | "all",
-                                )
-                            }
-                        >
-                            <option value="all">All categories</option>
-                            {packageCategories.map((x) => (
-                                <option key={x}>{x}</option>
-                            ))}
-                        </select>
-                        <select
-                            className={input}
+                            onValueChange={(value) => resetLocation(value as PackageCategory | "all")}
+                            options={[{value:"all",label:"All categories"},...packageCategories.map(value=>({value,label:value}))]}
+                        />
+                        <SelectField
+                            className="h-10"
                             value={country}
-                            onChange={(e) => {
-                                setCountry(e.target.value);
+                            onValueChange={(value) => {
+                                setCountry(value);
                                 setState("all");
                                 setCity("all");
                             }}
-                        >
-                            <option value="all">All countries</option>
-                            {countries.map((x) => (
-                                <option key={x}>{x}</option>
-                            ))}
-                        </select>
-                        <select
-                            className={input}
+                            options={[{value:"all",label:"All countries"},...countries.map(value=>({value,label:value}))]}
+                        />
+                        <SelectField
+                            className="h-10"
                             value={state}
-                            onChange={(e) => {
-                                setState(e.target.value);
+                            onValueChange={(value) => {
+                                setState(value);
                                 setCity("all");
                             }}
-                        >
-                            <option value="all">All states</option>
-                            {states.map((x) => (
-                                <option key={x}>{x}</option>
-                            ))}
-                        </select>
-                        <select
-                            className={input}
+                            options={[{value:"all",label:"All states"},...states.map(value=>({value,label:value}))]}
+                        />
+                        <SelectField
+                            className="h-10"
                             value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                        >
-                            <option value="all">All cities</option>
-                            {cities.map((x) => (
-                                <option key={x}>{x}</option>
-                            ))}
-                        </select>
+                            onValueChange={setCity}
+                            options={[{value:"all",label:"All cities"},...cities.map(value=>({value,label:value}))]}
+                        />
                     </div>
                 </section>
                 <section className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">

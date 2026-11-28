@@ -13,12 +13,14 @@ import {
     Plane,
     ExternalLink,
     Inbox,
+    ContactRound,
 } from "lucide-react";
 
 const workspace = [
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
     { href: "/admin/inbox", label: "Inbox", icon: Inbox },
     { href: "/admin/leads", label: "Leads", icon: UsersRound },
+    { href: "/admin/clients", label: "Travelers", icon: ContactRound },
     { href: "/admin/follow-up", label: "Follow-ups", icon: CalendarClock },
     { href: "/admin/trips", label: "Trips", icon: Briefcase },
 ];

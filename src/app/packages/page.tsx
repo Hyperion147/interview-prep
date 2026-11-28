@@ -8,6 +8,7 @@ import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Navbar from "@/components/pages/landing/navbar";
 import Footer from "@/components/global/Footer";
+import { SelectField } from "@/components/ui/select-field";
 import {
     FaHotel,
     FaMapMarkerAlt,
@@ -194,33 +195,25 @@ export default function Packages() {
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground/50">
                             <FaFilter />
                         </div>
-                        <select
+                        <SelectField
                             value={selectedRegion}
-                            onChange={(event) => {
-                                setSelectedRegion(event.target.value);
+                            onValueChange={(value) => {
+                                setSelectedRegion(value);
                                 setSelectedCity("All Cities");
                             }}
-                            className="pl-10 pr-8 py-3 bg-foreground/5 border border-foreground/10 rounded-sm focus:outline-none focus:border-primary appearance-none text-sm font-bold uppercase tracking-wider cursor-pointer hover:bg-foreground/10 transition-colors min-w-[200px]"
-                        >
-                            {regions.map((region) => (
-                                <option key={region} value={region}>
-                                    {region}
-                                </option>
-                            ))}
-                        </select>
+                            className="h-11 min-w-[200px] rounded-sm border-foreground/10 bg-foreground/5 pl-10 text-sm font-bold uppercase tracking-wider hover:bg-foreground/10"
+                            options={regions.map((value)=>({value,label:value}))}
+                        />
                     </div>
                     <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-foreground/50">
                             <FaMapMarkerAlt />
                         </div>
-                        <select
+                        <SelectField
                             value={selectedCity}
-                            onChange={(event) =>
-                                setSelectedCity(event.target.value)
-                            }
-                            className="pl-10 pr-8 py-3 bg-foreground/5 border border-foreground/10 rounded-sm focus:outline-none focus:border-primary appearance-none text-sm font-bold uppercase tracking-wider cursor-pointer hover:bg-foreground/10 transition-colors min-w-[200px]"
-                        >
-                            {cities
+                            onValueChange={setSelectedCity}
+                            className="h-11 min-w-[200px] rounded-sm border-foreground/10 bg-foreground/5 pl-10 text-sm font-bold uppercase tracking-wider hover:bg-foreground/10"
+                            options={cities
                                 .filter(
                                     (city) =>
                                         city === "All Cities" ||
@@ -231,12 +224,8 @@ export default function Packages() {
                                                 pkg.region === selectedRegion,
                                         ),
                                 )
-                                .map((city) => (
-                                    <option key={city} value={city}>
-                                        {city}
-                                    </option>
-                                ))}
-                        </select>
+                                .map((value) => ({value,label:value}))}
+                        />
                     </div>
                 </div>
 

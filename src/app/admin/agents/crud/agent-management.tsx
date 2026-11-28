@@ -1,5 +1,6 @@
 "use client";
 import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select-field";
 
 import { adminRequest as fetch } from "@/lib/crm/admin-request";
 
@@ -126,20 +127,17 @@ function AgentForm({
                         <span className="mb-1.5 block text-sm font-medium">
                             Status
                         </span>
-                        <select
-                            className={`${input} capitalize`}
+                        <SelectField
+                            className="h-10 capitalize"
                             value={form.status}
-                            onChange={(e) =>
+                            onValueChange={(value) =>
                                 setForm({
                                     ...form,
-                                    status: e.target.value as Agent["status"],
+                                    status: value as Agent["status"],
                                 })
                             }
-                        >
-                            <option>active</option>
-                            <option>suspended</option>
-                            <option>invited</option>
-                        </select>
+                            options={["active","suspended","invited"].map(value=>({value,label:value}))}
+                        />
                     </label>
                 ) : (
                     <label>

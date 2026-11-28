@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import gsap from "gsap";
@@ -21,7 +23,13 @@ const heroImages = [
     "https://images.unsplash.com/photo-1729922141827-ba9163bfb884?q=80&w=1920",
 ];
 
-export default function Hero() {
+export default function Hero({
+    accountHref,
+    accountLabel,
+}: {
+    accountHref?: string;
+    accountLabel?: string;
+}) {
     const container = useRef<HTMLDivElement>(null);
 
     const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
@@ -85,7 +93,7 @@ export default function Hero() {
             ref={container}
             className="travel-home bg-background min-h-screen font-sans text-foreground overflow-x-hidden selection:bg-primary selection:text-black"
         >
-            <Navbar />
+            <Navbar accountHref={accountHref} accountLabel={accountLabel} />
 
             <main className="grid grid-cols-1 divide-y divide-foreground/10 w-full relative">
                 {/* Hero Section */}

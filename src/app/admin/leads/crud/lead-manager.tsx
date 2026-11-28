@@ -1,12 +1,12 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { SelectField } from "@/components/ui/select-field";
 
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
-    ChevronDown,
     Pencil,
     Plus,
     Search,
@@ -144,34 +144,20 @@ function LeadForm({
                     />
                 </Field>
                 <Field label="Status">
-                    <select
-                        className={inputClass}
-                        onChange={(e) =>
-                            set("status", e.target.value as LeadStatus)
-                        }
+                    <SelectField
+                        className="h-10"
+                        onValueChange={(value) => set("status", value as LeadStatus)}
                         value={draft.status}
-                    >
-                        {leadStatuses.map((status) => (
-                            <option key={status} value={status}>
-                                {labels[status]}
-                            </option>
-                        ))}
-                    </select>
+                        options={leadStatuses.map(value=>({value,label:labels[value]}))}
+                    />
                 </Field>
                 <Field label="Lead source">
-                    <select
-                        className={inputClass}
-                        onChange={(e) =>
-                            set("source", e.target.value as LeadDraft["source"])
-                        }
+                    <SelectField
+                        className="h-10"
+                        onValueChange={(value) => set("source", value as LeadDraft["source"])}
                         value={draft.source}
-                    >
-                        {leadSources.map((source) => (
-                            <option key={source} value={source}>
-                                {source.replaceAll("_", " ")}
-                            </option>
-                        ))}
-                    </select>
+                        options={leadSources.map(value=>({value,label:value.replaceAll("_"," ")}))}
+                    />
                 </Field>
                 <Field label="Number of travelers">
                     <Input
@@ -403,27 +389,14 @@ export function LeadManager() {
                                     value={search}
                                 />
                             </div>
-                            <div className="relative">
-                                <select
+                            <div>
+                                <SelectField
                                     aria-label="Filter by status"
-                                    className={`${inputClass} min-w-44 appearance-none pr-9 capitalize`}
-                                    onChange={(e) =>
-                                        setStatus(
-                                            e.target.value as
-                                                | LeadStatus
-                                                | "all",
-                                        )
-                                    }
+                                    className="h-10 min-w-44 capitalize"
+                                    onValueChange={(value) => setStatus(value as LeadStatus | "all")}
                                     value={status}
-                                >
-                                    <option value="all">All statuses</option>
-                                    {leadStatuses.map((item) => (
-                                        <option key={item} value={item}>
-                                            {labels[item]}
-                                        </option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+                                    options={[{value:"all",label:"All statuses"},...leadStatuses.map(value=>({value,label:labels[value]}))]}
+                                />
                             </div>
                             <Button variant={reviewOnly ? "default" : "outline"} onClick={() => setReviewOnly((current) => !current)}>
                                 <AlertTriangle /> Needs review

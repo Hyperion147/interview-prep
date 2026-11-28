@@ -10,6 +10,7 @@ import * as authSchema from "./schema/auth";
 import * as chatbotSchema from "./schema/chatbot";
 import * as whatsappSchema from "./schema/whatsapp";
 import * as tripWorkflowSchema from "./schema/trip-workflow";
+import * as travelerSchema from "./schema/travelers";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not configured");
@@ -30,5 +31,6 @@ export const db = drizzle(pool, {
     ...chatbotSchema,
     ...whatsappSchema,
     ...tripWorkflowSchema,
+    ...travelerSchema,
   },
 });

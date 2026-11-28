@@ -1,8 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FaAngleRight, FaArrowRight } from "react-icons/fa6";
 
-const Navbar = () => {
+type NavbarProps = {
+    accountHref?: string;
+    accountLabel?: string;
+};
+
+const Navbar = ({
+    accountHref = "/auth/login",
+    accountLabel = "Sign In",
+}: NavbarProps) => {
     const [isDestinationsOpen, setIsDestinationsOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
@@ -18,7 +28,7 @@ const Navbar = () => {
     const navLinks = [
         { name: "Destinations", href: "" },
         { name: "Packages", href: "/packages" },
-        { name: "My trips", href: "/trips" },
+        { name: "My portal", href: "/portal" },
         { name: "About", href: "/about" },
         { name: "Contact", href: "/#cta" },
     ];
@@ -138,14 +148,14 @@ const Navbar = () => {
                     </ul>
 
                     <Link
-                        href="/auth/login"
+                        href={accountHref}
                         className={`px-6 py-2 rounded-sm text-sm font-bold transition-all duration-300 inline-block ${
                             isDestinationsOpen
                                 ? "bg-primary text-accent-foreground hover:shadow-[0_0_5px_rgba(255,248,212,0.8)]"
                                 : "bg-foreground text-background hover:bg-primary"
                         }`}
                     >
-                        Sign In
+                        {accountLabel}
                     </Link>
                 </div>
 
@@ -263,11 +273,11 @@ const Navbar = () => {
                     </ul>
                     <div className="mt-8 flex justify-center w-full">
                         <Link
-                            href="/auth/login"
+                            href={accountHref}
                             onClick={() => setIsMobileMenuOpen(false)}
                             className="px-8 py-3 rounded-sm text-lg font-bold bg-primary text-accent-foreground hover:shadow-[0_0_10px_rgba(255,248,212,0.8)] transition-all"
                         >
-                            Sign In
+                            {accountLabel}
                         </Link>
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 "use client";
 import { AdminSkeleton } from "@/components/admin-skeleton";
 import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select-field";
 import { Textarea } from "@/components/ui/textarea";
 
 import { adminRequest as fetch } from "@/lib/crm/admin-request";
@@ -151,18 +152,12 @@ function FollowUpForm({
                     </Field>
                 </div>
                 <Field label="Lead">
-                    <select
-                        className={input}
+                    <SelectField
+                        className="h-10"
                         value={draft.leadId ?? ""}
-                        onChange={(e) => set("leadId", e.target.value || null)}
-                    >
-                        <option value="">Unassigned</option>
-                        {leads.map((lead) => (
-                            <option key={lead.id} value={lead.id}>
-                                {lead.fullName} · {lead.email}
-                            </option>
-                        ))}
-                    </select>
+                        onValueChange={(value) => set("leadId", value || null)}
+                        options={[{value:"",label:"Unassigned"},...leads.map(lead=>({value:lead.id,label:`${lead.fullName} · ${lead.email}`}))]}
+                    />
                 </Field>
                 <Field label="Schedule">
                     <Input
@@ -174,52 +169,28 @@ function FollowUpForm({
                     />
                 </Field>
                 <Field label="Channel">
-                    <select
-                        className={`${input} capitalize`}
+                    <SelectField
+                        className="h-10 capitalize"
                         value={draft.channel}
-                        onChange={(e) =>
-                            set(
-                                "channel",
-                                e.target.value as FollowUpDraft["channel"],
-                            )
-                        }
-                    >
-                        {followUpChannels.map((value) => (
-                            <option key={value}>{value}</option>
-                        ))}
-                    </select>
+                        onValueChange={(value) => set("channel", value as FollowUpDraft["channel"])}
+                        options={followUpChannels.map(value=>({value,label:value}))}
+                    />
                 </Field>
                 <Field label="Priority">
-                    <select
-                        className={`${input} capitalize`}
+                    <SelectField
+                        className="h-10 capitalize"
                         value={draft.priority}
-                        onChange={(e) =>
-                            set(
-                                "priority",
-                                e.target.value as FollowUpDraft["priority"],
-                            )
-                        }
-                    >
-                        {followUpPriorities.map((value) => (
-                            <option key={value}>{value}</option>
-                        ))}
-                    </select>
+                        onValueChange={(value) => set("priority", value as FollowUpDraft["priority"])}
+                        options={followUpPriorities.map(value=>({value,label:value}))}
+                    />
                 </Field>
                 <Field label="Status">
-                    <select
-                        className={`${input} capitalize`}
+                    <SelectField
+                        className="h-10 capitalize"
                         value={draft.status}
-                        onChange={(e) =>
-                            set(
-                                "status",
-                                e.target.value as FollowUpDraft["status"],
-                            )
-                        }
-                    >
-                        {followUpStatuses.map((value) => (
-                            <option key={value}>{value}</option>
-                        ))}
-                    </select>
+                        onValueChange={(value) => set("status", value as FollowUpDraft["status"])}
+                        options={followUpStatuses.map(value=>({value,label:value}))}
+                    />
                 </Field>
                 <div className="sm:col-span-2">
                     <Field label="Notes">
@@ -419,16 +390,12 @@ export function FollowUpManagement() {
                                 placeholder="Search follow-up or lead…"
                             />
                         </div>
-                        <select
-                            className={`${input} w-auto min-w-40 capitalize`}
+                        <SelectField
+                            className="h-10 min-w-40 capitalize"
                             value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                        >
-                            <option value="all">All statuses</option>
-                            {followUpStatuses.map((value) => (
-                                <option key={value}>{value}</option>
-                            ))}
-                        </select>
+                            onValueChange={setStatus}
+                            options={[{value:"all",label:"All statuses"},...followUpStatuses.map(value=>({value,label:value}))]}
+                        />
                     </div>
                     <div className="divide-y">
                         {shown.map((item) => {

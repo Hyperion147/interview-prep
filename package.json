@@ -11,6 +11,7 @@
     "db:push": "drizzle-kit push",
     "auth:bootstrap-admin": "tsx scripts/bootstrap-admin.ts",
     "whatsapp:test-webhook": "tsx scripts/test-whatsapp-webhook.ts",
+    "db:seed:travelers": "tsx scripts/seed-traveler-workflow.ts",
     "test": "tsx --test tests/**/*.test.ts"
   },
   "dependencies": {
