@@ -10,6 +10,7 @@ import {
     Pencil,
     Plus,
     Search,
+    MessageCircle,
     Trash2,
     UserRound,
     X,
@@ -22,7 +23,7 @@ import {
     type LeadDraft,
     type LeadStatus,
 } from "./types";
-import { SummaryChatBot } from "../chatbot/summary-chatbot";
+import { LeadAutomationPanel } from "./lead-automation-panel";
 
 const emptyDraft: LeadDraft = {
     fullName: "",
@@ -286,6 +287,7 @@ export function LeadManager() {
     const [deleting, setDeleting] = useState<Lead | null>(null);
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [deletingBusy, setDeletingBusy] = useState(false);
+    const [automating, setAutomating] = useState<Lead | null>(null);
     const filtered = useMemo(
         () =>
             leads.filter(
@@ -317,7 +319,6 @@ export function LeadManager() {
                         Lead management
                     </h1>
                 </header>
-                <SummaryChatBot />
                 <div className="p-5 sm:p-8">
                     <section className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                         <div>
@@ -504,6 +505,13 @@ export function LeadManager() {
                                             <TableCell className="px-5 py-4">
                                                 <div className="flex justify-end gap-1">
                                                     <Button
+                                                        aria-label={`Open WhatsApp automation for ${lead.fullName}`}
+                                                        className="rounded-lg p-2 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
+                                                        onClick={() => setAutomating(lead)}
+                                                    >
+                                                        <MessageCircle className="size-4" />
+                                                    </Button>
+                                                    <Button
                                                         aria-label={`Edit ${lead.fullName}`}
                                                         className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                                                         onClick={() =>
@@ -573,6 +581,7 @@ export function LeadManager() {
                     />
                 </Dialog>
             )}
+            {automating && <LeadAutomationPanel lead={automating} onClose={() => setAutomating(null)} />}
             {deleting && (
                 <Dialog
                     onClose={() => setDeleting(null)}

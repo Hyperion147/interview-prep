@@ -8,6 +8,8 @@ import * as packageSchema from "./schema/packages";
 import * as followUpSchema from "./schema/follow-ups";
 import * as authSchema from "./schema/auth";
 import * as chatbotSchema from "./schema/chatbot";
+import * as whatsappSchema from "./schema/whatsapp";
+import * as tripWorkflowSchema from "./schema/trip-workflow";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not configured");
@@ -18,4 +20,15 @@ const pool = globalForDb.leadPool ?? new Pool({ connectionString: process.env.DA
 
 if (process.env.NODE_ENV !== "production") globalForDb.leadPool = pool;
 
-export const db = drizzle(pool, { schema: { ...leadSchema, ...visaSchema, ...packageSchema, ...followUpSchema, ...authSchema, ...chatbotSchema } });
+export const db = drizzle(pool, {
+  schema: {
+    ...leadSchema,
+    ...visaSchema,
+    ...packageSchema,
+    ...followUpSchema,
+    ...authSchema,
+    ...chatbotSchema,
+    ...whatsappSchema,
+    ...tripWorkflowSchema,
+  },
+});
