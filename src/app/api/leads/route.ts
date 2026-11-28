@@ -1,12 +1,45 @@
-import { desc } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { leads } from "@/db/schema/leads";
+import { leadAutomation } from "@/db/schema/whatsapp";
 import { canAccess } from "@/lib/auth/authorization";
 
 export async function GET() {
     if (!(await canAccess("leads:read")))
         return Response.json({ error: "Forbidden" }, { status: 403 });
-    const rows = await db.select().from(leads).orderBy(desc(leads.createdAt));
+    const rows = await db.select({
+        id: leads.id,
+        fullName: leads.fullName,
+        email: leads.email,
+        phone: leads.phone,
+        destination: leads.destination,
+        status: leads.status,
+        source: leads.source,
+        travelers: leads.travelers,
+        estimatedValue: leads.estimatedValue,
+        notes: leads.notes,
+        nextFollowUpAt: leads.nextFollowUpAt,
+        createdAt: leads.createdAt,
+        updatedAt: leads.updatedAt,
+        handoffRequired: sql<boolean>`coalesce(${leadAutomation.handoffRequired}, false)`,
+        aiPriority: leadAutomation.priority,
+        unreadWhatsApp: sql<number>`(
+            select count(*)::int from whatsapp_messages wm
+            where wm.lead_id = ${leads.id}
+              and wm.direction = 'inbound'
+              and wm.created_at > coalesce(${leadAutomation.lastViewedAt}, to_timestamp(0))
+        )`,
+        lastWhatsAppMessage: sql<string | null>`(
+            select wm.body from whatsapp_messages wm
+            where wm.lead_id = ${leads.id}
+            order by wm.created_at desc limit 1
+        )`,
+        whatsappDeliveryFailed: sql<boolean>`exists(
+            select 1 from whatsapp_messages wm
+            where wm.lead_id = ${leads.id} and wm.status = 'failed'
+        )`,
+    }).from(leads).leftJoin(leadAutomation, eq(leadAutomation.leadId, leads.id))
+        .orderBy(desc(leads.createdAt));
     return Response.json(rows);
 }
 

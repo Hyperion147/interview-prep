@@ -35,6 +35,13 @@ export function LeadAutomationPanel({ lead, onClose }: { lead: Lead; onClose: ()
             .catch((error: Error) => toast.error(error.message));
         return () => { active = false; };
     }, [lead.id]);
+    useEffect(() => {
+        fetch(`/api/leads/${lead.id}/automation`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ markViewed: true }),
+        }).catch(() => undefined);
+    }, [lead.id]);
 
     async function summarize() {
         setBusy(true);

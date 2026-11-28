@@ -18,6 +18,11 @@ export type Lead = {
   nextFollowUpAt: string;
   createdAt: string;
   updatedAt: string;
+  handoffRequired: boolean;
+  aiPriority: string | null;
+  unreadWhatsApp: number;
+  lastWhatsAppMessage: string | null;
+  whatsappDeliveryFailed: boolean;
 };
 
-export type LeadDraft = Omit<Lead, "id" | "createdAt" | "updatedAt">;
+export type LeadDraft = Omit<Lead, "id" | "createdAt" | "updatedAt" | "handoffRequired" | "aiPriority" | "unreadWhatsApp" | "lastWhatsAppMessage" | "whatsappDeliveryFailed">;

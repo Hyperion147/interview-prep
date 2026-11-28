@@ -23,6 +23,11 @@ function normalizeLead(row: LeadRow): Lead {
     estimatedValue: Number(row.estimatedValue),
     nextFollowUpAt: row.nextFollowUpAt?.slice(0, 10) ?? "",
     notes: row.notes ?? "",
+    handoffRequired: row.handoffRequired ?? false,
+    aiPriority: row.aiPriority ?? null,
+    unreadWhatsApp: Number(row.unreadWhatsApp ?? 0),
+    lastWhatsAppMessage: row.lastWhatsAppMessage ?? null,
+    whatsappDeliveryFailed: row.whatsappDeliveryFailed ?? false,
   };
 }
 

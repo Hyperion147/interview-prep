@@ -4,13 +4,16 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
     ChevronDown,
     Pencil,
     Plus,
     Search,
     MessageCircle,
+    PauseCircle,
+    PlayCircle,
+    AlertTriangle,
     Trash2,
     UserRound,
     X,
@@ -288,11 +291,21 @@ export function LeadManager() {
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [deletingBusy, setDeletingBusy] = useState(false);
     const [automating, setAutomating] = useState<Lead | null>(null);
+    const [reviewOnly, setReviewOnly] = useState(false);
+    const [globalAutomation, setGlobalAutomation] = useState(true);
+    useEffect(() => {
+        fetch("/api/whatsapp/settings")
+            .then((response) => response.ok ? response.json() : null)
+            .then((settings) => {
+                if (settings) setGlobalAutomation(settings.whatsappAutoReplyEnabled);
+            });
+    }, []);
     const filtered = useMemo(
         () =>
             leads.filter(
                 (lead) =>
                     (status === "all" || lead.status === status) &&
+                    (!reviewOnly || lead.handoffRequired) &&
                     [
                         lead.fullName,
                         lead.email,
@@ -302,7 +315,7 @@ export function LeadManager() {
                         value.toLowerCase().includes(search.toLowerCase()),
                     ),
             ),
-        [leads, search, status],
+        [leads, reviewOnly, search, status],
     );
     const pipelineValue = leads.reduce(
         (sum, lead) => sum + lead.estimatedValue,
@@ -329,13 +342,22 @@ export function LeadManager() {
                                 Create, qualify, and track every travel enquiry.
                             </p>
                         </div>
-                        <Button
-                            className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
-                            onClick={() => setEditing("new")}
-                        >
-                            <Plus className="size-4" />
-                            Add lead
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button variant="outline" onClick={async () => {
+                                const enabled = !globalAutomation;
+                                const response = await fetch("/api/whatsapp/settings", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ enabled }) });
+                                if (response.ok) setGlobalAutomation(enabled);
+                            }}>
+                                {globalAutomation ? <PauseCircle /> : <PlayCircle />}
+                                {globalAutomation ? "Pause AI replies" : "Resume AI replies"}
+                            </Button>
+                            <Button
+                                className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
+                                onClick={() => setEditing("new")}
+                            >
+                                <Plus className="size-4" /> Add lead
+                            </Button>
+                        </div>
                     </section>
 
                     <section className="mb-6 grid gap-4 sm:grid-cols-3">
@@ -403,6 +425,9 @@ export function LeadManager() {
                                 </select>
                                 <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
                             </div>
+                            <Button variant={reviewOnly ? "default" : "outline"} onClick={() => setReviewOnly((current) => !current)}>
+                                <AlertTriangle /> Needs review
+                            </Button>
                         </div>
                         <div className="overflow-x-auto">
                             <Table className="w-full min-w-[940px] text-left text-sm">
@@ -449,11 +474,13 @@ export function LeadManager() {
                                                     <div>
                                                         <p className="font-semibold text-slate-900">
                                                             {lead.fullName}
+                                                            {lead.unreadWhatsApp > 0 && <span className="ml-2 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] text-white">{lead.unreadWhatsApp} new</span>}
                                                         </p>
                                                         <p className="text-xs text-slate-500">
                                                             {lead.email} ·{" "}
                                                             {lead.phone}
                                                         </p>
+                                                        {lead.lastWhatsAppMessage && <p className="mt-1 max-w-64 truncate text-xs text-emerald-700">{lead.lastWhatsAppMessage}</p>}
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -479,6 +506,11 @@ export function LeadManager() {
                                                 >
                                                     {labels[lead.status]}
                                                 </span>
+                                                <div className="mt-2 flex gap-1">
+                                                    {lead.handoffRequired && <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700">Review</span>}
+                                                    {lead.aiPriority && <span className="rounded bg-violet-50 px-1.5 py-0.5 text-[10px] font-semibold capitalize text-violet-700">{lead.aiPriority}</span>}
+                                                    {lead.whatsappDeliveryFailed && <span className="rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-semibold text-rose-700">Delivery failed</span>}
+                                                </div>
                                             </TableCell>
                                             <TableCell className="px-5 py-4 font-semibold">
                                                 ₹

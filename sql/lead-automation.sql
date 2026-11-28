@@ -20,9 +20,11 @@ CREATE TABLE IF NOT EXISTS public.lead_automation (
     priority text,
     missing_details jsonb NOT NULL DEFAULT '[]'::jsonb,
     suggested_reply text,
+    extracted_details jsonb NOT NULL DEFAULT '{}'::jsonb,
     last_inbound_at timestamptz,
     last_outbound_at timestamptz,
     summarized_at timestamptz,
+    last_viewed_at timestamptz,
     updated_at timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT lead_automation_intent_check CHECK (intent IS NULL OR intent IN ('researching', 'planning', 'ready_to_book', 'support', 'unknown')),
     CONSTRAINT lead_automation_sentiment_check CHECK (sentiment IS NULL OR sentiment IN ('positive', 'neutral', 'negative')),
@@ -46,5 +48,13 @@ CREATE INDEX IF NOT EXISTS whatsapp_messages_status_idx ON public.whatsapp_messa
 
 ALTER TABLE public.lead_automation ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.whatsapp_messages ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE IF NOT EXISTS public.crm_automation_settings (
+    id text PRIMARY KEY DEFAULT 'default',
+    whatsapp_auto_reply_enabled boolean NOT NULL DEFAULT true,
+    updated_at timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE public.crm_automation_settings ENABLE ROW LEVEL SECURITY;
+INSERT INTO public.crm_automation_settings (id) VALUES ('default') ON CONFLICT DO NOTHING;
 
 COMMIT;

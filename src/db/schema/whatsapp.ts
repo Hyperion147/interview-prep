@@ -74,9 +74,30 @@ export const leadAutomation = pgTable("lead_automation", {
     priority: text("priority"),
     missingDetails: jsonb("missing_details").$type<string[]>().default([]).notNull(),
     suggestedReply: text("suggested_reply"),
+    extractedDetails: jsonb("extracted_details")
+        .$type<{
+            destination?: string;
+            travelers?: number;
+            budget?: number;
+            travelDates?: string;
+        }>()
+        .default({})
+        .notNull(),
     lastInboundAt: timestamp("last_inbound_at", { withTimezone: true }),
     lastOutboundAt: timestamp("last_outbound_at", { withTimezone: true }),
     summarizedAt: timestamp("summarized_at", { withTimezone: true }),
+    lastViewedAt: timestamp("last_viewed_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
+}).enableRLS();
+
+export const crmAutomationSettings = pgTable("crm_automation_settings", {
+    id: text("id").primaryKey().default("default"),
+    whatsappAutoReplyEnabled: boolean("whatsapp_auto_reply_enabled")
+        .default(true)
+        .notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
         .defaultNow()
         .$onUpdate(() => new Date())

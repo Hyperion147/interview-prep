@@ -1,18 +1,23 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { after } from "next/server";
 import { db } from "@/db";
 import { followUps } from "@/db/schema/follow-ups";
 import { leads } from "@/db/schema/leads";
-import { leadAutomation, whatsappEvents, whatsappMessages } from "@/db/schema/whatsapp";
+import { crmAutomationSettings, leadAutomation, whatsappEvents, whatsappMessages } from "@/db/schema/whatsapp";
 import { captureEnquiry } from "@/lib/crm/intake";
 import { generateLeadInsight } from "@/lib/crm/lead-ai";
 import { sendWhatsAppText } from "@/lib/whatsapp/cloud-api";
+import {
+    canAdvanceDeliveryStatus,
+    deliveryStatusOrder,
+    extractWhatsAppBody,
+    needsImmediateHandoff,
+    verifyWebhookSignature,
+    type IncomingWhatsAppMessage,
+} from "@/lib/whatsapp/webhook-logic";
 
-type Incoming = { id: string; from: string; timestamp: string; type?: string; text?: { body?: string }; button?: { text?: string }; interactive?: { button_reply?: { title?: string }; list_reply?: { title?: string } } };
 type Status = { id?: string; status?: string; timestamp?: string; errors?: Array<{ title?: string; message?: string }> };
-type Payload = { entry?: Array<{ changes?: Array<{ value?: { metadata?: { phone_number_id?: string }; messages?: Incoming[]; statuses?: Status[] } }> }> };
-const statusOrder = ["queued", "sent", "delivered", "read", "failed"] as const;
+type Payload = { entry?: Array<{ changes?: Array<{ value?: { metadata?: { phone_number_id?: string }; contacts?: Array<{ profile?: { name?: string }; wa_id?: string }>; messages?: IncomingWhatsAppMessage[]; statuses?: Status[] } }> }> };
 
 export function GET(request: Request) {
     const params = new URL(request.url).searchParams;
@@ -21,37 +26,36 @@ export function GET(request: Request) {
         ? new Response(params.get("hub.challenge")) : new Response(null, { status: 403 });
 }
 
-function messageBody(message: Incoming) {
-    return message.text?.body?.trim() || message.button?.text?.trim()
-        || message.interactive?.button_reply?.title?.trim()
-        || message.interactive?.list_reply?.title?.trim() || "";
-}
-
-function needsImmediateHandoff(body: string, message: Incoming) {
-    const age = Date.now() - Number(message.timestamp) * 1000;
-    return !body || !["text", "button", "interactive"].includes(message.type ?? "text")
-        || /\b(agent|human|refund|complaint|payment|cancel|emergency|unsafe)\b/i.test(body)
-        || !Number.isFinite(age) || age < -60_000 || age >= 24 * 60 * 60 * 1000;
-}
-
 async function flagForHandoff(leadId: string, messageId: string, body: string, title: string) {
     const now = new Date();
     await db.transaction(async (tx) => {
         await tx.update(whatsappEvents).set({ status: "needs_review" }).where(eq(whatsappEvents.id, messageId));
         await tx.insert(leadAutomation).values({ leadId, handoffRequired: true, autoReplyEnabled: false, lastInboundAt: now })
             .onConflictDoUpdate({ target: leadAutomation.leadId, set: { handoffRequired: true, autoReplyEnabled: false, lastInboundAt: now, updatedAt: now } });
-        await tx.insert(followUps).values({ leadId, title, channel: "whatsapp", priority: "high", scheduledAt: now, notes: body.slice(0, 1500) });
+        const [existingTask] = await tx.select({ id: followUps.id }).from(followUps)
+            .where(and(eq(followUps.leadId, leadId), eq(followUps.channel, "whatsapp"), eq(followUps.status, "scheduled"))).limit(1);
+        if (!existingTask) await tx.insert(followUps).values({ leadId, title, channel: "whatsapp", priority: "high", scheduledAt: now, notes: body.slice(0, 1500) });
     });
 }
 
-async function handleMessage(message: Incoming) {
+async function handleMessage(message: IncomingWhatsAppMessage, contactName?: string) {
     if (!/^\d{7,15}$/.test(message.from) || !message.id) return;
-    const body = messageBody(message);
+    const [alreadyProcessed] = await db.select({ id: whatsappMessages.id })
+        .from(whatsappMessages).where(eq(whatsappMessages.id, message.id)).limit(1);
+    if (alreadyProcessed) return;
+    const body = extractWhatsAppBody(message);
     const handoff = needsImmediateHandoff(body, message);
-    const lead = await captureEnquiry({
-        fullName: "WhatsApp enquiry", email: "", phone: message.from,
+    let lead = await captureEnquiry({
+        fullName: contactName?.trim().slice(0, 160) || "WhatsApp enquiry", email: "", phone: message.from,
         destination: "To be confirmed", source: "other",
     }, message.id, handoff, body);
+    if (!lead) {
+        const [resumable] = await db.select({ lead: leads })
+            .from(whatsappEvents)
+            .innerJoin(leads, eq(whatsappEvents.leadId, leads.id))
+            .where(eq(whatsappEvents.id, message.id)).limit(1);
+        lead = resumable?.lead;
+    }
     if (!lead) return;
     const receivedAt = Number.isFinite(Number(message.timestamp)) ? new Date(Number(message.timestamp) * 1000) : new Date();
     await db.transaction(async (tx) => {
@@ -59,10 +63,22 @@ async function handleMessage(message: Incoming) {
             id: message.id, leadId: lead.id, direction: "inbound", status: "received",
             body: body || `[Unsupported WhatsApp ${message.type ?? "message"}]`, providerTimestamp: receivedAt,
         }).onConflictDoNothing();
-        await tx.insert(leadAutomation).values({ leadId: lead.id, lastInboundAt: receivedAt, handoffRequired: handoff })
+        await tx.insert(leadAutomation).values({
+            leadId: lead.id,
+            lastInboundAt: receivedAt,
+            handoffRequired: handoff,
+            autoReplyEnabled: !handoff,
+        })
             .onConflictDoUpdate({ target: leadAutomation.leadId, set: { lastInboundAt: receivedAt, ...(handoff ? { handoffRequired: true, autoReplyEnabled: false } : {}), updatedAt: new Date() } });
     });
     if (handoff) return;
+
+    const [globalSettings] = await db.select().from(crmAutomationSettings)
+        .where(eq(crmAutomationSettings.id, "default")).limit(1);
+    if (globalSettings && !globalSettings.whatsappAutoReplyEnabled) {
+        await flagForHandoff(lead.id, message.id, body, "Reply to WhatsApp enquiry — automation paused");
+        return;
+    }
 
     let insight;
     try {
@@ -94,10 +110,10 @@ async function handleMessage(message: Incoming) {
 }
 
 async function handleStatus(status: Status) {
-    if (!status.id || !status.status || !statusOrder.includes(status.status as (typeof statusOrder)[number])) return;
-    const next = status.status as (typeof statusOrder)[number];
+    if (!status.id || !status.status || !deliveryStatusOrder.includes(status.status as (typeof deliveryStatusOrder)[number])) return;
+    const next = status.status as (typeof deliveryStatusOrder)[number];
     const [current] = await db.select({ status: whatsappMessages.status }).from(whatsappMessages).where(eq(whatsappMessages.id, status.id)).limit(1);
-    if (!current || (next !== "failed" && statusOrder.indexOf(next) < statusOrder.indexOf(current.status as (typeof statusOrder)[number]))) return;
+    if (!current || !canAdvanceDeliveryStatus(current.status, next)) return;
     await db.update(whatsappMessages).set({
         status: next,
         error: next === "failed" ? status.errors?.map((error) => error.message ?? error.title).filter(Boolean).join("; ").slice(0, 1000) || "Delivery failed" : null,
@@ -111,8 +127,7 @@ export async function POST(request: Request) {
     if (!secret || !phoneId) return new Response(null, { status: 503 });
     const raw = Buffer.from(await request.arrayBuffer());
     const signature = request.headers.get("x-hub-signature-256") ?? "";
-    const expected = `sha256=${createHmac("sha256", secret).update(raw).digest("hex")}`;
-    if (!/^sha256=[a-f0-9]{64}$/.test(signature) || !timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return new Response(null, { status: 403 });
+    if (!verifyWebhookSignature(raw, signature, secret)) return new Response(null, { status: 403 });
     try {
         const payload = JSON.parse(raw.toString("utf8")) as Payload;
         after(async () => {
@@ -120,7 +135,10 @@ export async function POST(request: Request) {
                 for (const entry of payload.entry ?? []) for (const change of entry.changes ?? []) {
                     if (change.value?.metadata?.phone_number_id !== phoneId) continue;
                     for (const status of change.value.statuses ?? []) await handleStatus(status);
-                    for (const message of change.value.messages ?? []) await handleMessage(message);
+                    for (const message of change.value.messages ?? []) {
+                        const contactName = change.value.contacts?.find((contact) => contact.wa_id === message.from)?.profile?.name;
+                        await handleMessage(message, contactName);
+                    }
                 }
             } catch (error) {
                 console.error("WhatsApp background processing failed", error);
