@@ -1,5 +1,11 @@
 "use client";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
+import { adminRequest as fetch } from "@/lib/crm/admin-request";
+
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Eye, FileCheck2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
@@ -79,7 +85,7 @@ function VisaForm({
         <form onSubmit={submit}>
             <div className="grid gap-4 p-6 sm:grid-cols-2">
                 <Field label="Applicant name">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.applicantName}
@@ -87,7 +93,7 @@ function VisaForm({
                     />
                 </Field>
                 <Field label="Email">
-                    <input
+                    <Input
                         className={input}
                         required
                         type="email"
@@ -96,7 +102,7 @@ function VisaForm({
                     />
                 </Field>
                 <Field label="Phone">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.phone}
@@ -104,7 +110,7 @@ function VisaForm({
                     />
                 </Field>
                 <Field label="Passport number">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.passportNumber}
@@ -114,7 +120,7 @@ function VisaForm({
                     />
                 </Field>
                 <Field label="Destination">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.destinationCountry}
@@ -124,7 +130,7 @@ function VisaForm({
                     />
                 </Field>
                 <Field label="Visa type">
-                    <input
+                    <Input
                         className={input}
                         required
                         placeholder="Tourist Visa"
@@ -162,7 +168,7 @@ function VisaForm({
                     </select>
                 </Field>
                 <Field label="Progress (%)">
-                    <input
+                    <Input
                         className={input}
                         min="0"
                         max="100"
@@ -174,7 +180,7 @@ function VisaForm({
                     />
                 </Field>
                 <Field label="Application value (₹)">
-                    <input
+                    <Input
                         className={input}
                         min="0"
                         type="number"
@@ -185,7 +191,7 @@ function VisaForm({
                     />
                 </Field>
                 <Field label="Submitted on">
-                    <input
+                    <Input
                         className={input}
                         type="date"
                         value={draft.submittedAt}
@@ -194,7 +200,7 @@ function VisaForm({
                 </Field>
                 <div className="sm:col-span-2">
                     <Field label="Notes">
-                        <textarea
+                        <Textarea
                             className={`${input} h-24 py-2`}
                             value={draft.notes}
                             onChange={(e) => set("notes", e.target.value)}
@@ -203,19 +209,20 @@ function VisaForm({
                 </div>
             </div>
             <div className="flex justify-end gap-3 border-t bg-slate-50 px-6 py-4">
-                <button
+                <Button
                     type="button"
                     onClick={onClose}
                     className="rounded-lg border bg-white px-4 py-2 text-sm font-semibold"
                 >
                     Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                    type="submit"
                     disabled={saving}
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
                 >
                     {saving ? "Saving…" : "Create application"}
-                </button>
+                </Button>
             </div>
         </form>
     );
@@ -278,13 +285,13 @@ export function VisaManagement() {
                             publication.
                         </p>
                     </div>
-                    <button
+                    <Button
                         onClick={() => setAdding(true)}
                         className="flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
                     >
                         <Plus className="size-4" />
                         New application
-                    </button>
+                    </Button>
                 </div>
                 <section className="mb-6 grid gap-4 sm:grid-cols-4">
                     {[
@@ -319,7 +326,7 @@ export function VisaManagement() {
                     <div className="flex flex-col gap-3 border-b p-4 sm:flex-row">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-3 size-4 text-slate-400" />
-                            <input
+                            <Input
                                 className={`${input} pl-9`}
                                 placeholder="Search applicant, passport, country, or visa…"
                                 value={query}
@@ -340,27 +347,27 @@ export function VisaManagement() {
                         </select>
                     </div>
                     <div className="overflow-x-auto">
-                        <table className="w-full min-w-[980px] text-left text-sm">
-                            <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
-                                <tr>
-                                    <th className="px-5 py-3">Applicant</th>
-                                    <th className="px-5 py-3">Visa</th>
-                                    <th className="px-5 py-3">Status</th>
-                                    <th className="px-5 py-3">Documents</th>
-                                    <th className="px-5 py-3">Progress</th>
-                                    <th className="px-5 py-3">Created</th>
-                                    <th className="px-5 py-3 text-right">
+                        <Table className="w-full min-w-[980px] text-left text-sm">
+                            <TableHeader className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                                <TableRow>
+                                    <TableHead className="px-5 py-3">Applicant</TableHead>
+                                    <TableHead className="px-5 py-3">Visa</TableHead>
+                                    <TableHead className="px-5 py-3">Status</TableHead>
+                                    <TableHead className="px-5 py-3">Documents</TableHead>
+                                    <TableHead className="px-5 py-3">Progress</TableHead>
+                                    <TableHead className="px-5 py-3">Created</TableHead>
+                                    <TableHead className="px-5 py-3 text-right">
                                         Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y">
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody className="divide-y">
                                 {shown.map((item) => (
-                                    <tr
+                                    <TableRow
                                         className="hover:bg-slate-50"
                                         key={item.id}
                                     >
-                                        <td className="px-5 py-4">
+                                        <TableCell className="px-5 py-4">
                                             <p className="font-semibold">
                                                 {item.applicantName}
                                             </p>
@@ -368,27 +375,27 @@ export function VisaManagement() {
                                                 {item.passportNumber} ·{" "}
                                                 {item.email}
                                             </p>
-                                        </td>
-                                        <td className="px-5 py-4">
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4">
                                             <p>{item.visaType}</p>
                                             <p className="text-xs text-slate-500">
                                                 {item.destinationCountry}
                                             </p>
-                                        </td>
-                                        <td className="px-5 py-4">
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4">
                                             <span
                                                 className={`rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${statusColor[item.status]}`}
                                             >
                                                 {item.status}
                                             </span>
-                                        </td>
-                                        <td className="px-5 py-4">
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4">
                                             <span className="inline-flex items-center gap-1.5 capitalize text-slate-600">
                                                 <FileCheck2 className="size-4" />
                                                 {item.documentStatus}
                                             </span>
-                                        </td>
-                                        <td className="px-5 py-4">
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4">
                                             <div className="flex items-center gap-2">
                                                 <div className="h-2 w-24 rounded-full bg-slate-100">
                                                     <div
@@ -402,8 +409,8 @@ export function VisaManagement() {
                                                     {item.progress}%
                                                 </span>
                                             </div>
-                                        </td>
-                                        <td className="px-5 py-4 text-slate-500">
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4 text-slate-500">
                                             {new Date(
                                                 item.createdAt,
                                             ).toLocaleDateString("en-IN", {
@@ -411,8 +418,8 @@ export function VisaManagement() {
                                                 month: "short",
                                                 year: "numeric",
                                             })}
-                                        </td>
-                                        <td className="px-5 py-4">
+                                        </TableCell>
+                                        <TableCell className="px-5 py-4">
                                             <div className="flex justify-end gap-1">
                                                 <Link
                                                     title="View application"
@@ -428,29 +435,29 @@ export function VisaManagement() {
                                                 >
                                                     <Pencil className="size-4" />
                                                 </Link>
-                                                <button
+                                                <Button
                                                     title="Delete application"
                                                     onClick={() => remove(item)}
                                                     className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                                                 >
                                                     <Trash2 className="size-4" />
-                                                </button>
+                                                </Button>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 ))}
                                 {shown.length === 0 && (
-                                    <tr>
-                                        <td
+                                    <TableRow>
+                                        <TableCell
                                             colSpan={7}
                                             className="py-16 text-center text-slate-500"
                                         >
                                             No visa applications found.
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                    </TableRow>
                                 )}
-                            </tbody>
-                        </table>
+                            </TableBody>
+                        </Table>
                     </div>
                     <div className="border-t px-5 py-3 text-sm text-slate-500">
                         Showing {shown.length} of {items.length} applications
@@ -469,9 +476,9 @@ export function VisaManagement() {
                                     Create and begin tracking an application.
                                 </p>
                             </div>
-                            <button onClick={() => setAdding(false)}>
+                            <Button onClick={() => setAdding(false)}>
                                 <X className="size-5" />
-                            </button>
+                            </Button>
                         </div>
                         <VisaForm
                             initial={blank}

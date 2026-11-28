@@ -6,9 +6,9 @@ export const instant = false;
 export default async function LoginPage({
     searchParams,
 }: {
-    searchParams: Promise<{ error?: string }>;
+    searchParams: Promise<{ error?: string; next?: string }>;
 }) {
-    const { error } = await searchParams;
+    const { error, next } = await searchParams;
     const configured = hasSupabaseAuthConfig();
     return (
         <main className="grid min-h-screen place-items-center bg-slate-950 p-5 text-slate-900">
@@ -25,6 +25,7 @@ export default async function LoginPage({
                         enquiries.
                     </p>
                     <form action={signInWithGoogle} className="mt-10">
+                        <input type="hidden" name="next" value={next === "/enquire" || next === "/trips" ? next : "/"} />
                         <button
                             disabled={!configured}
                             className="w-full rounded-xl bg-white px-4 py-3 font-semibold text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"

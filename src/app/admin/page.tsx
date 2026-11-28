@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { Card } from "@/components/ui/card";
+import { buttonVariants } from "@/components/ui/button";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { connection } from "next/server";
 import { asc, desc, eq } from "drizzle-orm";
 import type { LucideIcon } from "lucide-react";
@@ -90,7 +93,7 @@ function StatCard({
     accent: string;
 }) {
     return (
-        <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <Card className="gap-0 rounded-xl border-slate-200 bg-white p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
                 <p className="text-sm font-medium text-slate-500">{label}</p>
                 <span
@@ -99,11 +102,11 @@ function StatCard({
                     <Icon className="size-4.5" />
                 </span>
             </div>
-            <p className="mt-4 text-3xl font-bold tracking-tight text-slate-950">
+            <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950 tabular-nums">
                 {value}
             </p>
-            <p className="mt-1 text-xs text-slate-400">{detail}</p>
-        </article>
+            <p className="mt-1 text-xs text-slate-500">{detail}</p>
+        </Card>
     );
 }
 
@@ -251,38 +254,26 @@ export default async function AdminDashboard() {
     const recentLeads = leadRows.slice(0, 5);
 
     return (
-        <main className="min-h-screen">
-            <header className="flex flex-col justify-between gap-4 border-b border-slate-200 bg-white px-5 py-5 sm:flex-row sm:items-center sm:px-8">
+        <main className="mx-auto min-h-screen max-w-[96rem] px-4 pb-8 sm:px-7">
+            <header className="flex flex-wrap items-center justify-between gap-4 py-6 sm:py-8">
                 <div>
-                    <p className="text-xs font-semibold uppercase tracking-[.18em] text-blue-600">
-                        Operations
-                    </p>
-                    <h1 className="mt-1 text-2xl font-bold text-slate-950">
-                        Dashboard
+                    <h1 className="text-2xl font-semibold tracking-tight text-slate-950">
+                        Workspace overview
                     </h1>
                     <p className="mt-1 text-sm text-slate-500">
                         {longDate.format(now)}
                     </p>
                 </div>
                 <Link
-                    className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
-                    href="/admin/leads"
+                    className={buttonVariants({ variant: "outline", size: "lg" })}
+                    href="/admin/trips"
                 >
-                    <span className="text-lg leading-none">+</span> Add new lead
+                    Manage trips
                 </Link>
             </header>
 
-            <div className="p-5 sm:p-8">
-                <section className="mb-6">
-                    <h2 className="text-2xl font-bold tracking-tight text-slate-950">
-                        Welcome back
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-500">
-                        Here is how your travel business is performing today.
-                    </p>
-                </section>
-
-                <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="space-y-5">
+                <section aria-label="Key metrics" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     <StatCard
                         accent="bg-blue-50 text-blue-600"
                         detail={`${openLeads.length} open leads · ${conversionRate}% conversion`}
@@ -313,7 +304,7 @@ export default async function AdminDashboard() {
                     />
                 </section>
 
-                <section className="mt-6 grid gap-5 xl:grid-cols-3">
+                <section className="grid gap-4 xl:grid-cols-3">
                     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm xl:col-span-2">
                         <SectionHeading
                             href="/admin/leads"
@@ -433,7 +424,7 @@ export default async function AdminDashboard() {
                     </div>
                 </section>
 
-                <section className="mt-6 grid gap-5 xl:grid-cols-3">
+                <section className="grid gap-4 xl:grid-cols-3">
                     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2">
                         <div className="border-b border-slate-100 p-5">
                             <SectionHeading
@@ -444,33 +435,33 @@ export default async function AdminDashboard() {
                             />
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full min-w-[680px] text-left text-sm">
-                                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
-                                    <tr>
-                                        <th className="px-5 py-3 font-semibold">
+                            <Table className="w-full min-w-[680px] text-left text-sm">
+                                <TableHeader className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                                    <TableRow>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Lead
-                                        </th>
-                                        <th className="px-5 py-3 font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Destination
-                                        </th>
-                                        <th className="px-5 py-3 font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Status
-                                        </th>
-                                        <th className="px-5 py-3 font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Value
-                                        </th>
-                                        <th className="px-5 py-3 font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Added
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody className="divide-y divide-slate-100">
                                     {recentLeads.map((lead) => (
-                                        <tr
+                                        <TableRow
                                             className="transition hover:bg-slate-50/70"
                                             key={lead.id}
                                         >
-                                            <td className="px-5 py-4">
+                                            <TableCell className="px-5 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="grid size-9 place-items-center rounded-full bg-blue-50 text-xs font-bold text-blue-700">
                                                         {lead.fullName
@@ -491,42 +482,42 @@ export default async function AdminDashboard() {
                                                         </p>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-5 py-4 text-slate-600">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4 text-slate-600">
                                                 {lead.destination}
-                                            </td>
-                                            <td className="px-5 py-4">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4">
                                                 <span
                                                     className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${leadStyles[lead.status]}`}
                                                 >
                                                     {leadLabels[lead.status]}
                                                 </span>
-                                            </td>
-                                            <td className="px-5 py-4 font-semibold text-slate-900">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4 font-semibold text-slate-900">
                                                 {currency.format(
                                                     Number(lead.estimatedValue),
                                                 )}
-                                            </td>
-                                            <td className="px-5 py-4 text-slate-500">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4 text-slate-500">
                                                 {shortDate.format(
                                                     lead.createdAt,
                                                 )}
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
                                     {recentLeads.length === 0 && (
-                                        <tr>
-                                            <td
+                                        <TableRow>
+                                            <TableCell
                                                 className="px-5 py-12 text-center text-slate-500"
                                                 colSpan={5}
                                             >
                                                 No leads yet. Add your first
                                                 enquiry to start tracking.
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     )}
-                                </tbody>
-                            </table>
+                                </TableBody>
+                            </Table>
                         </div>
                     </div>
 
@@ -612,7 +603,7 @@ export default async function AdminDashboard() {
                     </div>
                 </section>
 
-                <section className="mt-6 grid gap-4 sm:grid-cols-3">
+                <section className="grid gap-3 sm:grid-cols-3">
                     <Link
                         className="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                         href="/admin/leads"

@@ -1,5 +1,9 @@
 "use client";
+import { Input } from "@/components/ui/input";
 
+import { adminRequest as fetch } from "@/lib/crm/admin-request";
+
+import { Button } from "@/components/ui/button";
 import { FormEvent, useEffect, useState } from "react";
 import {
     KeyRound,
@@ -81,7 +85,7 @@ function AgentForm({
                     <span className="mb-1.5 block text-sm font-medium">
                         Full name
                     </span>
-                    <input
+                    <Input
                         className={input}
                         required
                         value={form.fullName}
@@ -94,7 +98,7 @@ function AgentForm({
                     <span className="mb-1.5 block text-sm font-medium">
                         Email
                     </span>
-                    <input
+                    <Input
                         className={input}
                         disabled={Boolean(agent)}
                         type="email"
@@ -109,7 +113,7 @@ function AgentForm({
                     <span className="mb-1.5 block text-sm font-medium">
                         Phone
                     </span>
-                    <input
+                    <Input
                         className={input}
                         value={form.phone}
                         onChange={(e) =>
@@ -142,7 +146,7 @@ function AgentForm({
                         <span className="mb-1.5 block text-sm font-medium">
                             Temporary password
                         </span>
-                        <input
+                        <Input
                             className={input}
                             type="password"
                             minLength={8}
@@ -164,7 +168,7 @@ function AgentForm({
                                 className="flex items-center gap-2 rounded-lg border p-3 text-sm"
                                 key={value}
                             >
-                                <input
+                                <Input
                                     type="checkbox"
                                     checked={form.permissions.includes(value)}
                                     onChange={() => permission(value)}
@@ -181,14 +185,15 @@ function AgentForm({
                 </p>
             )}
             <div className="flex justify-end gap-3 border-t bg-slate-50 px-6 py-4">
-                <button
+                <Button
                     type="button"
                     onClick={close}
                     className="rounded-lg border bg-white px-4 py-2 text-sm font-semibold"
                 >
                     Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                    type="submit"
                     disabled={saving}
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
                 >
@@ -197,7 +202,7 @@ function AgentForm({
                         : agent
                           ? "Save authorization"
                           : "Create agent"}
-                </button>
+                </Button>
             </div>
         </form>
     );
@@ -246,13 +251,13 @@ export function AgentManagement() {
                             capability.
                         </p>
                     </div>
-                    <button
+                    <Button
                         onClick={() => setEditing("new")}
                         className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
                     >
                         <Plus className="size-4" />
                         Create agent
-                    </button>
+                    </Button>
                 </div>
                 {error && (
                     <p className="mb-5 rounded-xl bg-amber-50 p-4 text-sm text-amber-800">
@@ -300,20 +305,20 @@ export function AgentManagement() {
                                     </div>
                                 </div>
                                 <div className="flex gap-1 self-end sm:self-auto">
-                                    <button
+                                    <Button
                                         title="Edit authorization"
                                         onClick={() => setEditing(agent)}
                                         className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                                     >
                                         <Pencil className="size-4" />
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button
                                         title="Delete agent"
                                         onClick={() => remove(agent)}
                                         className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                                     >
                                         <Trash2 className="size-4" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </article>
                         ))}
@@ -361,9 +366,9 @@ export function AgentManagement() {
                                     Admin-only staff management.
                                 </p>
                             </div>
-                            <button onClick={() => setEditing(null)}>
+                            <Button onClick={() => setEditing(null)}>
                                 <X className="size-5" />
-                            </button>
+                            </Button>
                         </div>
                         <AgentForm
                             agent={editing === "new" ? null : editing}

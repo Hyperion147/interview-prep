@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Geist_Mono, Raleway } from "next/font/google";
 import { TravelChatbot } from "@/components/travel-chatbot";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full bg-slate-50">
         {children}
+        <Toaster richColors position="top-right" />
         <Suspense fallback={null}>
           <TravelChatbot />
         </Suspense>

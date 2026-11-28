@@ -1,6 +1,7 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { leads } from "@/db/schema/leads";
+import { followUps } from "@/db/schema/follow-ups";
 import { canAccess } from "@/lib/auth/authorization";
 
 export async function GET(
@@ -29,7 +30,9 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
     try {
-        const [updated] = await db
+        const updated = await db.transaction(async (tx) => {
+        const closing = body.status === "won" || body.status === "lost";
+        const [lead] = await tx
             .update(leads)
             .set({
                 fullName: body.fullName,
@@ -41,13 +44,19 @@ export async function PATCH(
                 travelers: Number(body.travelers ?? 1),
                 estimatedValue: String(body.estimatedValue ?? 0),
                 notes: body.notes ? body.notes : null,
-                nextFollowUpAt: body.nextFollowUpAt
+                nextFollowUpAt: !closing && body.nextFollowUpAt
                     ? new Date(body.nextFollowUpAt)
                     : null,
                 updatedAt: new Date(),
             })
             .where(eq(leads.id, id))
             .returning();
+        if (lead && closing) {
+            await tx.update(followUps).set({ status: "cancelled", outcome: "Lead closed" })
+                .where(and(eq(followUps.leadId, id), eq(followUps.status, "scheduled")));
+        }
+        return lead;
+        });
         return updated
             ? Response.json(updated)
             : Response.json({ error: "Not found" }, { status: 404 });

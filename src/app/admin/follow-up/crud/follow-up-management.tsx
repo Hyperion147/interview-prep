@@ -1,5 +1,11 @@
 "use client";
+import { AdminSkeleton } from "@/components/admin-skeleton";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
+import { adminRequest as fetch } from "@/lib/crm/admin-request";
+
+import { Button } from "@/components/ui/button";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
     CalendarClock,
@@ -135,7 +141,7 @@ function FollowUpForm({
             <div className="grid gap-4 p-6 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                     <Field label="Follow-up title">
-                        <input
+                        <Input
                             className={input}
                             required
                             value={draft.title}
@@ -159,7 +165,7 @@ function FollowUpForm({
                     </select>
                 </Field>
                 <Field label="Schedule">
-                    <input
+                    <Input
                         className={input}
                         type="datetime-local"
                         required
@@ -217,7 +223,7 @@ function FollowUpForm({
                 </Field>
                 <div className="sm:col-span-2">
                     <Field label="Notes">
-                        <textarea
+                        <Textarea
                             className={`${input} h-20 py-2`}
                             value={draft.notes ?? ""}
                             onChange={(e) => set("notes", e.target.value)}
@@ -228,7 +234,7 @@ function FollowUpForm({
                 {draft.status === "completed" && (
                     <div className="sm:col-span-2">
                         <Field label="Outcome">
-                            <textarea
+                            <Textarea
                                 className={`${input} h-20 py-2`}
                                 value={draft.outcome ?? ""}
                                 onChange={(e) => set("outcome", e.target.value)}
@@ -244,14 +250,15 @@ function FollowUpForm({
                 </p>
             )}
             <div className="flex justify-end gap-3 border-t bg-slate-50 px-6 py-4">
-                <button
+                <Button
                     type="button"
                     onClick={onClose}
                     className="rounded-lg border bg-white px-4 py-2 text-sm font-semibold"
                 >
                     Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                    type="submit"
                     disabled={saving}
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
                 >
@@ -260,7 +267,7 @@ function FollowUpForm({
                         : item
                           ? "Save changes"
                           : "Schedule follow-up"}
-                </button>
+                </Button>
             </div>
         </form>
     );
@@ -333,12 +340,7 @@ export function FollowUpManagement() {
             setItems((old) => old.filter((row) => row.id !== item.id));
         else setError("Unable to delete follow-up");
     }
-    if (loading)
-        return (
-            <main className="grid min-h-screen place-items-center text-sm text-slate-500">
-                Loading follow-ups from Supabase…
-            </main>
-        );
+    if (loading) return <AdminSkeleton label="Loading follow-ups" />;
 
     return (
         <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -361,13 +363,13 @@ export function FollowUpManagement() {
                             forward.
                         </p>
                     </div>
-                    <button
+                    <Button
                         onClick={() => setEditing("new")}
                         className="flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
                     >
                         <Plus className="size-4" />
                         New follow-up
-                    </button>
+                    </Button>
                 </div>
                 <section className="mb-6 grid gap-4 sm:grid-cols-3">
                     <div className="rounded-2xl border bg-white p-5 shadow-sm">
@@ -410,7 +412,7 @@ export function FollowUpManagement() {
                     <div className="flex flex-col gap-3 border-b p-4 sm:flex-row">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-3 size-4 text-slate-400" />
-                            <input
+                            <Input
                                 className={`${input} pl-9`}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -473,7 +475,7 @@ export function FollowUpManagement() {
                                     </div>
                                     <div className="flex items-center gap-1 self-end sm:self-auto">
                                         {item.status !== "completed" && (
-                                            <button
+                                            <Button
                                                 title="Mark completed"
                                                 onClick={async () => {
                                                     const response =
@@ -499,22 +501,22 @@ export function FollowUpManagement() {
                                                 className="rounded-lg p-2 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"
                                             >
                                                 <CheckCircle2 className="size-4" />
-                                            </button>
+                                            </Button>
                                         )}
-                                        <button
+                                        <Button
                                             title="Edit"
                                             onClick={() => setEditing(item)}
                                             className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                                         >
                                             <Pencil className="size-4" />
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
                                             title="Delete"
                                             onClick={() => remove(item)}
                                             className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                                         >
                                             <Trash2 className="size-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </article>
                             );
@@ -548,9 +550,9 @@ export function FollowUpManagement() {
                                     action.
                                 </p>
                             </div>
-                            <button onClick={() => setEditing(null)}>
+                            <Button onClick={() => setEditing(null)}>
                                 <X className="size-5" />
-                            </button>
+                            </Button>
                         </div>
                         <FollowUpForm
                             item={editing === "new" ? null : editing}

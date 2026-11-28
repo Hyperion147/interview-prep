@@ -318,10 +318,10 @@ export default function Packages() {
                                                     {pkg.durationNights} Nights
                                                 </div>
                                                 <Link
-                                                    href="/auth/login"
+                                                    href={`/enquire?destination=${encodeURIComponent(pkg.name)}`}
                                                     className="px-6 py-3 rounded-sm bg-primary text-accent-foreground font-bold text-sm hover:brightness-110 active:scale-95 transition-all duration-300 flex items-center gap-2 group-hover:gap-3"
                                                 >
-                                                    Book Now{" "}
+                                                    Enquire{" "}
                                                     <FaArrowRight className="text-xs" />
                                                 </Link>
                                             </div>

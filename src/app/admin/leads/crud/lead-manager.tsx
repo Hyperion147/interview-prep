@@ -1,5 +1,9 @@
 "use client";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { FormEvent, useMemo, useState } from "react";
 import {
     ChevronDown,
@@ -99,7 +103,7 @@ function LeadForm({
         <form onSubmit={submit}>
             <div className="grid gap-4 p-6 sm:grid-cols-2">
                 <Field label="Full name">
-                    <input
+                    <Input
                         className={inputClass}
                         onChange={(e) => set("fullName", e.target.value)}
                         placeholder="e.g. Aditi Sharma"
@@ -108,7 +112,7 @@ function LeadForm({
                     />
                 </Field>
                 <Field label="Email address">
-                    <input
+                    <Input
                         className={inputClass}
                         onChange={(e) => set("email", e.target.value)}
                         placeholder="name@example.com"
@@ -118,7 +122,7 @@ function LeadForm({
                     />
                 </Field>
                 <Field label="Phone number">
-                    <input
+                    <Input
                         className={inputClass}
                         onChange={(e) => set("phone", e.target.value)}
                         placeholder="+91 98765 43210"
@@ -127,7 +131,7 @@ function LeadForm({
                     />
                 </Field>
                 <Field label="Destination">
-                    <input
+                    <Input
                         className={inputClass}
                         onChange={(e) => set("destination", e.target.value)}
                         placeholder="e.g. Canada"
@@ -166,7 +170,7 @@ function LeadForm({
                     </select>
                 </Field>
                 <Field label="Number of travelers">
-                    <input
+                    <Input
                         className={inputClass}
                         min="1"
                         onChange={(e) =>
@@ -178,7 +182,7 @@ function LeadForm({
                     />
                 </Field>
                 <Field label="Estimated value (₹)">
-                    <input
+                    <Input
                         className={inputClass}
                         min="0"
                         onChange={(e) =>
@@ -189,7 +193,7 @@ function LeadForm({
                     />
                 </Field>
                 <Field label="Next follow-up">
-                    <input
+                    <Input
                         className={inputClass}
                         onChange={(e) => set("nextFollowUpAt", e.target.value)}
                         type="date"
@@ -198,7 +202,7 @@ function LeadForm({
                 </Field>
                 <div className="sm:col-span-2">
                     <Field label="Notes">
-                        <textarea
+                        <Textarea
                             className={`${inputClass} h-24 resize-none py-2.5`}
                             onChange={(e) => set("notes", e.target.value)}
                             placeholder="Add context, requirements, or the next action…"
@@ -213,20 +217,20 @@ function LeadForm({
                         {error}
                     </p>
                 )}
-                <button
+                <Button
                     className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
                     onClick={onCancel}
                     type="button"
                 >
                     Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={saving}
                     type="submit"
                 >
                     {saving ? "Saving…" : "Save lead"}
-                </button>
+                </Button>
             </div>
         </form>
     );
@@ -260,13 +264,13 @@ function Dialog({
                             {subtitle}
                         </p>
                     </div>
-                    <button
+                    <Button
                         aria-label="Close dialog"
                         className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
                         onClick={onClose}
                     >
                         <X className="size-5" />
-                    </button>
+                    </Button>
                 </div>
                 {children}
             </div>
@@ -324,13 +328,13 @@ export function LeadManager() {
                                 Create, qualify, and track every travel enquiry.
                             </p>
                         </div>
-                        <button
+                        <Button
                             className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700"
                             onClick={() => setEditing("new")}
                         >
                             <Plus className="size-4" />
                             Add lead
-                        </button>
+                        </Button>
                     </section>
 
                     <section className="mb-6 grid gap-4 sm:grid-cols-3">
@@ -368,7 +372,7 @@ export function LeadManager() {
                         <div className="flex flex-col gap-3 border-b border-slate-100 p-4 sm:flex-row">
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
-                                <input
+                                <Input
                                     aria-label="Search leads"
                                     className={`${inputClass} pl-9`}
                                     onChange={(e) => setSearch(e.target.value)}
@@ -400,36 +404,36 @@ export function LeadManager() {
                             </div>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full min-w-[940px] text-left text-sm">
-                                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
-                                    <tr>
-                                        <th className="px-5 py-3 font-semibold">
+                            <Table className="w-full min-w-[940px] text-left text-sm">
+                                <TableHeader className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                                    <TableRow>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Lead
-                                        </th>
-                                        <th className="px-5 py-3 font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Destination
-                                        </th>
-                                        <th className="px-5 py-3 font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Status
-                                        </th>
-                                        <th className="px-5 py-3 font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Value
-                                        </th>
-                                        <th className="px-5 py-3 font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 font-semibold">
                                             Follow-up
-                                        </th>
-                                        <th className="px-5 py-3 text-right font-semibold">
+                                        </TableHead>
+                                        <TableHead className="px-5 py-3 text-right font-semibold">
                                             Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100">
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody className="divide-y divide-slate-100">
                                     {filtered.map((lead) => (
-                                        <tr
+                                        <TableRow
                                             className="hover:bg-slate-50/70"
                                             key={lead.id}
                                         >
-                                            <td className="px-5 py-4">
+                                            <TableCell className="px-5 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="grid size-10 place-items-center rounded-full bg-blue-50 font-bold text-blue-700">
                                                         {lead.fullName
@@ -451,8 +455,8 @@ export function LeadManager() {
                                                         </p>
                                                     </div>
                                                 </div>
-                                            </td>
-                                            <td className="px-5 py-4">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4">
                                                 <p className="font-medium">
                                                     {lead.destination}
                                                 </p>
@@ -467,21 +471,21 @@ export function LeadManager() {
                                                         " ",
                                                     )}
                                                 </p>
-                                            </td>
-                                            <td className="px-5 py-4">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4">
                                                 <span
                                                     className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${statusStyles[lead.status]}`}
                                                 >
                                                     {labels[lead.status]}
                                                 </span>
-                                            </td>
-                                            <td className="px-5 py-4 font-semibold">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4 font-semibold">
                                                 ₹
                                                 {lead.estimatedValue.toLocaleString(
                                                     "en-IN",
                                                 )}
-                                            </td>
-                                            <td className="px-5 py-4 text-slate-600">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4 text-slate-600">
                                                 {lead.nextFollowUpAt
                                                     ? new Intl.DateTimeFormat(
                                                           "en-IN",
@@ -496,10 +500,10 @@ export function LeadManager() {
                                                           ),
                                                       )
                                                     : "Not scheduled"}
-                                            </td>
-                                            <td className="px-5 py-4">
+                                            </TableCell>
+                                            <TableCell className="px-5 py-4">
                                                 <div className="flex justify-end gap-1">
-                                                    <button
+                                                    <Button
                                                         aria-label={`Edit ${lead.fullName}`}
                                                         className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                                                         onClick={() =>
@@ -507,8 +511,8 @@ export function LeadManager() {
                                                         }
                                                     >
                                                         <Pencil className="size-4" />
-                                                    </button>
-                                                    <button
+                                                    </Button>
+                                                    <Button
                                                         aria-label={`Delete ${lead.fullName}`}
                                                         className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                                                         onClick={() => {
@@ -517,14 +521,14 @@ export function LeadManager() {
                                                         }}
                                                     >
                                                         <Trash2 className="size-4" />
-                                                    </button>
+                                                    </Button>
                                                 </div>
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     ))}
                                     {filtered.length === 0 && (
-                                        <tr>
-                                            <td
+                                        <TableRow>
+                                            <TableCell
                                                 className="px-5 py-16 text-center"
                                                 colSpan={6}
                                             >
@@ -536,11 +540,11 @@ export function LeadManager() {
                                                     Try changing your search or
                                                     status filter.
                                                 </p>
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </TableRow>
                                     )}
-                                </tbody>
-                            </table>
+                                </TableBody>
+                            </Table>
                         </div>
                         <div className="border-t border-slate-100 px-5 py-3 text-sm text-slate-500">
                             Showing {filtered.length} of {leads.length} leads
@@ -589,13 +593,13 @@ export function LeadManager() {
                                     {deleteError}
                                 </p>
                             )}
-                            <button
+                            <Button
                                 className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700"
                                 onClick={() => setDeleting(null)}
                             >
                                 Cancel
-                            </button>
-                            <button
+                            </Button>
+                            <Button
                                 className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
                                 disabled={deletingBusy}
                                 onClick={async () => {
@@ -616,7 +620,7 @@ export function LeadManager() {
                                 }}
                             >
                                 {deletingBusy ? "Deleting…" : "Delete lead"}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </Dialog>

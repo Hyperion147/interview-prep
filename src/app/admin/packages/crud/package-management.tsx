@@ -1,5 +1,11 @@
 "use client";
+import { AdminSkeleton } from "@/components/admin-skeleton";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
+import { adminRequest as fetch } from "@/lib/crm/admin-request";
+
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
@@ -107,7 +113,7 @@ function PackageForm({
             <div className="grid gap-4 p-6 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                     <Field label="Package name">
-                        <input
+                        <Input
                             className={input}
                             required
                             value={draft.name}
@@ -153,7 +159,7 @@ function PackageForm({
                     </select>
                 </Field>
                 <Field label="Country">
-                    <input
+                    <Input
                         className={input}
                         required
                         readOnly={draft.category === "domestic"}
@@ -162,7 +168,7 @@ function PackageForm({
                     />
                 </Field>
                 <Field label="State / region">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.state}
@@ -170,7 +176,7 @@ function PackageForm({
                     />
                 </Field>
                 <Field label="City">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.city}
@@ -178,7 +184,7 @@ function PackageForm({
                     />
                 </Field>
                 <Field label="Display region">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.region}
@@ -187,7 +193,7 @@ function PackageForm({
                     />
                 </Field>
                 <Field label="Location label">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.locationLabel}
@@ -197,7 +203,7 @@ function PackageForm({
                 </Field>
                 <div className="sm:col-span-2">
                     <Field label="Cover image URL">
-                        <input
+                        <Input
                             className={input}
                             type="url"
                             required
@@ -207,7 +213,7 @@ function PackageForm({
                     </Field>
                 </div>
                 <Field label="Hotel / accommodation">
-                    <input
+                    <Input
                         className={input}
                         required
                         value={draft.hotel}
@@ -215,7 +221,7 @@ function PackageForm({
                     />
                 </Field>
                 <Field label="Rating">
-                    <input
+                    <Input
                         className={input}
                         type="number"
                         min="0"
@@ -227,7 +233,7 @@ function PackageForm({
                     />
                 </Field>
                 <Field label="Price per person (₹)">
-                    <input
+                    <Input
                         className={input}
                         type="number"
                         min="0"
@@ -237,7 +243,7 @@ function PackageForm({
                     />
                 </Field>
                 <Field label="Days">
-                    <input
+                    <Input
                         className={input}
                         type="number"
                         min="1"
@@ -249,7 +255,7 @@ function PackageForm({
                     />
                 </Field>
                 <Field label="Nights">
-                    <input
+                    <Input
                         className={input}
                         type="number"
                         min="0"
@@ -262,7 +268,7 @@ function PackageForm({
                 </Field>
                 <div className="sm:col-span-2">
                     <Field label="Features (comma separated)">
-                        <textarea
+                        <Textarea
                             className={`${input} h-20 py-2`}
                             value={draft.features.join(", ")}
                             onChange={(e) =>
@@ -280,7 +286,7 @@ function PackageForm({
                 </div>
                 <div className="sm:col-span-2">
                     <Field label="Description">
-                        <textarea
+                        <Textarea
                             className={`${input} h-24 py-2`}
                             required
                             value={draft.description}
@@ -295,14 +301,15 @@ function PackageForm({
                 </p>
             )}
             <div className="flex justify-end gap-3 border-t bg-slate-50 px-6 py-4">
-                <button
+                <Button
                     type="button"
                     onClick={onClose}
                     className="rounded-lg border bg-white px-4 py-2 text-sm font-semibold"
                 >
                     Cancel
-                </button>
-                <button
+                </Button>
+                <Button
+                    type="submit"
                     disabled={saving}
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
                 >
@@ -311,7 +318,7 @@ function PackageForm({
                         : item
                           ? "Save changes"
                           : "Create package"}
-                </button>
+                </Button>
             </div>
         </form>
     );
@@ -407,12 +414,7 @@ export function PackageManagement() {
         setState("all");
         setCity("all");
     }
-    if (loading)
-        return (
-            <main className="grid min-h-screen place-items-center bg-slate-50 text-sm text-slate-500">
-                Loading packages from Supabase…
-            </main>
-        );
+    if (loading) return <AdminSkeleton label="Loading packages" />;
     if (error)
         return (
             <main className="grid min-h-screen place-items-center bg-slate-50 p-6">
@@ -421,12 +423,12 @@ export function PackageManagement() {
                         Packages could not be loaded
                     </h1>
                     <p className="mt-2 text-sm text-rose-700">{error}</p>
-                    <button
+                    <Button
                         className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white"
                         onClick={() => window.location.reload()}
                     >
                         Try again
-                    </button>
+                    </Button>
                 </div>
             </main>
         );
@@ -460,13 +462,13 @@ export function PackageManagement() {
                             experiences.
                         </p>
                     </div>
-                    <button
+                    <Button
                         onClick={() => setEditing("new")}
                         className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white"
                     >
                         <Plus className="size-4" />
                         New package
-                    </button>
+                    </Button>
                 </div>
                 <section className="mb-6 grid gap-4 sm:grid-cols-3">
                     <div className="rounded-2xl border bg-white p-5 shadow-sm">
@@ -499,7 +501,7 @@ export function PackageManagement() {
                     <div className="grid gap-3 lg:grid-cols-[2fr_repeat(4,1fr)]">
                         <div className="relative">
                             <Search className="absolute left-3 top-3 size-4 text-slate-400" />
-                            <input
+                            <Input
                                 className={`${input} pl-9`}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
@@ -610,20 +612,20 @@ export function PackageManagement() {
                                         </p>
                                     </div>
                                     <div className="flex gap-1">
-                                        <button
+                                        <Button
                                             title="Edit"
                                             onClick={() => setEditing(item)}
                                             className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600"
                                         >
                                             <Pencil className="size-4" />
-                                        </button>
-                                        <button
+                                        </Button>
+                                        <Button
                                             title="Delete"
                                             onClick={() => remove(item)}
                                             className="rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
                                         >
                                             <Trash2 className="size-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
@@ -657,9 +659,9 @@ export function PackageManagement() {
                                     details.
                                 </p>
                             </div>
-                            <button onClick={() => setEditing(null)}>
+                            <Button onClick={() => setEditing(null)}>
                                 <X className="size-5" />
-                            </button>
+                            </Button>
                         </div>
                         <PackageForm
                             item={editing === "new" ? null : editing}

@@ -15,15 +15,15 @@ export default async function AdminLayout({
     const identity = configured ? await getStaffIdentity() : null;
     if (configured && !identity) redirect("/auth/login");
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="crm-workspace min-h-screen bg-slate-50 lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]">
             <Suspense
                 fallback={
-                    <div className="hidden lg:fixed lg:inset-y-0 lg:block lg:w-64 lg:bg-slate-950" />
+                    <div className="hidden border-r border-slate-200 bg-white lg:block" />
                 }
             >
                 <AdminSidebar role={identity?.role ?? "admin"} />
             </Suspense>
-            <div className="min-w-0 lg:ml-64">{children}</div>
+            <div className="min-w-0">{children}</div>
         </div>
     );
 }

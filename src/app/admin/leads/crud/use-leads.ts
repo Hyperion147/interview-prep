@@ -1,5 +1,7 @@
 "use client";
 
+import { adminRequest as fetch } from "@/lib/crm/admin-request";
+
 import { useEffect, useReducer } from "react";
 import type { Lead, LeadDraft } from "./types";
 

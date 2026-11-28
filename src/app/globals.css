@@ -140,3 +140,10 @@
         @apply font-sans;
     }
 }
+
+.crm-workspace {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    --primary: #4338ca;
+    --primary-foreground: #fff;
+    --ring: #818cf8;
+}

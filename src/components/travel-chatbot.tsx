@@ -47,6 +47,7 @@ export function TravelChatbot() {
     const [draft, setDraft] = useState("");
     const [interactionId, setInteractionId] = useState("");
     const [sending, setSending] = useState(false);
+    const [remaining, setRemaining] = useState<number | null>(null);
     const inputRef = useRef<HTMLTextAreaElement>(null);
     const nextId = useRef(2);
 
@@ -69,7 +70,7 @@ export function TravelChatbot() {
     async function sendMessage(event: FormEvent) {
         event.preventDefault();
         const message = draft.trim();
-        if (!message || sending) return;
+        if (!message || sending || remaining === 0) return;
 
         setDraft("");
         setSending(true);
@@ -85,6 +86,9 @@ export function TravelChatbot() {
                 body: JSON.stringify({ message, interactionId }),
             });
             const data: unknown = await response.json();
+            if (isRecord(data) && typeof data.remaining === "number") {
+                setRemaining(data.remaining);
+            }
             if (!response.ok) {
                 const detail =
                     isRecord(data) && typeof data.error === "string"
@@ -95,7 +99,8 @@ export function TravelChatbot() {
             if (
                 !isRecord(data) ||
                 typeof data.reply !== "string" ||
-                typeof data.interactionId !== "string"
+                typeof data.interactionId !== "string" ||
+                typeof data.remaining !== "number"
             ) {
                 throw new Error("The assistant returned an invalid response.");
             }
@@ -257,7 +262,7 @@ export function TravelChatbot() {
                             <textarea
                                 aria-label="Message the travel assistant"
                                 className="max-h-24 min-h-9 flex-1 resize-none bg-transparent px-2 py-2 text-sm outline-none placeholder:text-slate-400"
-                                disabled={sending}
+                                disabled={sending || remaining === 0}
                                 maxLength={1500}
                                 onChange={(event) =>
                                     setDraft(event.target.value)
@@ -271,7 +276,11 @@ export function TravelChatbot() {
                                         event.currentTarget.form?.requestSubmit();
                                     }
                                 }}
-                                placeholder="Ask about your next trip…"
+                                placeholder={
+                                    remaining === 0
+                                        ? "Daily limit reached"
+                                        : "Ask about your next trip…"
+                                }
                                 ref={inputRef}
                                 rows={1}
                                 value={draft}
@@ -279,7 +288,11 @@ export function TravelChatbot() {
                             <Button
                                 aria-label="Send message"
                                 className="size-9 rounded-lg bg-teal-600 text-white hover:bg-teal-700"
-                                disabled={!draft.trim() || sending}
+                                disabled={
+                                    !draft.trim() ||
+                                    sending ||
+                                    remaining === 0
+                                }
                                 size="icon-lg"
                                 type="submit"
                             >
@@ -287,8 +300,10 @@ export function TravelChatbot() {
                             </Button>
                         </div>
                         <p className="mt-2 text-center text-[11px] text-slate-400">
-                            AI can make mistakes. Confirm important travel
-                            details.
+                            {remaining === null
+                                ? "Daily message limits apply."
+                                : `${remaining} question${remaining === 1 ? "" : "s"} left today.`}{" "}
+                            AI can make mistakes.
                         </p>
                     </form>
                 </section>

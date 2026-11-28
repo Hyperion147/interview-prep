@@ -4,12 +4,15 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(formData: FormData) {
     const origin = (await headers()).get("origin") ?? "http://localhost:3000";
     const supabase = await createClient();
+    const callback = new URL("/auth/callback", origin);
+    const next = formData.get("next");
+    callback.searchParams.set("next", next === "/enquire" || next === "/trips" ? next : "/");
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: { redirectTo: `${origin}/auth/callback?next=/` },
+        options: { redirectTo: callback.toString() },
     });
     if (error)
         redirect(`/auth/login?error=${encodeURIComponent(error.message)}`);
